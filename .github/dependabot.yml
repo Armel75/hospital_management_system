@@ -1,0 +1,33 @@
+# =============================================================================
+# Dependabot — Mise à jour automatique des dépendances
+# =============================================================================
+# Documentation : https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# =============================================================================
+
+version: 2
+updates:
+  # Dépendances Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Dépendances GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"

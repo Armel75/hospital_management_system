@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hospital_consultation_all,consultation.all,model_hospital_consultation,base.group_user,1,0,0,0
+access_hospital_consultation_system,consultation.system,model_hospital_consultation,base.group_system,1,1,1,1
+access_hospital_consultation_secretary,consultation.secretary,model_hospital_consultation,care_center_base.group_hospital_secretary,1,0,0,0
+access_hospital_consultation_nurse,consultation.nurse,model_hospital_consultation,care_center_base.group_hospital_nurse,1,1,1,0
+access_hospital_consultation_doctor,consultation.doctor,model_hospital_consultation,care_center_base.group_hospital_doctor,1,1,1,1
+access_hospital_consultation_pharmacist,consultation.pharmacist,model_hospital_consultation,care_center_base.group_hospital_pharmacist,1,0,0,0
+access_hospital_consultation_manager,consultation.manager,model_hospital_consultation,care_center_base.group_hospital_manager,1,1,1,1

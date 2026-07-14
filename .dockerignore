@@ -1,0 +1,45 @@
+# =============================================================================
+# .dockerignore — Exclusion du contexte de build Docker
+# =============================================================================
+# Ces fichiers/dossiers sont ignorés par `docker build` pour :
+#   - Accélérer le build
+#   - Réduire la taille de l'image
+#   - Éviter d'exposer des secrets (.__pycache__, .git, .env)
+# =============================================================================
+
+# Git
+.git
+.gitattributes
+.gitignore
+.github/
+
+# Environnement
+.env
+.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+
+# Docker
+.docker/
+docker-compose.yml
+docker-compose.prod.yml
+
+# Documentation et meta
+README.md
+CHANGELOG.md
+CONTRIBUTING.md
+Makefile
+setup.cfg
+.pre-commit-config.yaml
+
+# Backups
+backups/
+scripts/

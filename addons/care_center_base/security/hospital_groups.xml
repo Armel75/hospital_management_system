@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- GROUPES D'UTILISATEURS                                               -->
+    <!-- =================================================================== -->
+
+    <!-- Groupe Secrétaire -->
+    <record id="group_hospital_secretary" model="res.groups">
+        <field name="name">Secrétaire médicale</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Gestion administrative : patients, rendez-vous, accueil</field>
+    </record>
+
+    <!-- Groupe Infirmier -->
+    <record id="group_hospital_nurse" model="res.groups">
+        <field name="name">Infirmier(ère)</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Soins infirmiers, constantes, administration des traitements</field>
+        <field name="implied_ids" eval="[(4, ref('group_hospital_secretary'))]"/>
+    </record>
+
+    <!-- Groupe Médecin -->
+    <record id="group_hospital_doctor" model="res.groups">
+        <field name="name">Médecin</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Consultations, prescriptions, dossiers médicaux complets</field>
+        <field name="implied_ids" eval="[(4, ref('group_hospital_nurse'))]"/>
+    </record>
+
+    <!-- Groupe Pharmacien -->
+    <record id="group_hospital_pharmacist" model="res.groups">
+        <field name="name">Pharmacien(ne)</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Gestion des médicaments et délivrance des prescriptions</field>
+    </record>
+
+    <!-- Gestionnaire -->
+    <record id="group_hospital_manager" model="res.groups">
+        <field name="name">Gestionnaire</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Facturation, statistiques, gestion administrative avancée</field>
+    </record>
+
+    <!-- Administrateur -->
+    <record id="group_hospital_admin" model="res.groups">
+        <field name="name">Administrateur hospitalier</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">Configuration, droits d'accès, audit</field>
+        <field name="implied_ids" eval="[
+            (4, ref('group_hospital_manager')),
+            (4, ref('group_hospital_doctor')),
+            (4, ref('group_hospital_pharmacist')),
+        ]"/>
+    </record>
+
+</odoo>

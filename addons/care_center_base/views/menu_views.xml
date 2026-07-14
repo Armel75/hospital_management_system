@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- MENU PRINCIPAL - CENTRE HOSPITALIER                                  -->
+    <!-- =================================================================== -->
+    <menuitem id="menu_care_center_root"
+              name="Centre Hospitalier"
+              sequence="10"
+              web_icon="care_center_base,static/description/icon.png"/>
+
+    <!-- =================================================================== -->
+    <!-- MENU PATIENTS                                                        -->
+    <!-- =================================================================== -->
+    <menuitem id="menu_care_center_patients"
+              name="Patients"
+              parent="menu_care_center_root"
+              sequence="10"
+              action="action_hospital_patient"/>
+
+    <menuitem id="menu_care_center_medical_records"
+              name="Dossiers médicaux"
+              parent="menu_care_center_root"
+              sequence="20"
+              action="action_hospital_medical_record"/>
+
+</odoo>

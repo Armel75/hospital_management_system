@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- CATÉGORIES DE MÉDICAMENTS                                            -->
+    <!-- =================================================================== -->
+
+    <!-- Niveau 1 : Grandes familles -->
+    <record id="cat_systeme_nerveux" model="hospital.pharmacy.category">
+        <field name="name">Système nerveux</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <record id="cat_systeme_cardiovasculaire" model="hospital.pharmacy.category">
+        <field name="name">Système cardiovasculaire</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="cat_anti_infectieux" model="hospital.pharmacy.category">
+        <field name="name">Anti-infectieux</field>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="cat_systeme_digestif" model="hospital.pharmacy.category">
+        <field name="name">Système digestif et métabolisme</field>
+        <field name="sequence">40</field>
+    </record>
+
+    <record id="cat_systeme_respiratoire" model="hospital.pharmacy.category">
+        <field name="name">Système respiratoire</field>
+        <field name="sequence">50</field>
+    </record>
+
+    <record id="cat_systeme_endocrinien" model="hospital.pharmacy.category">
+        <field name="name">Système endocrinien</field>
+        <field name="sequence">60</field>
+    </record>
+
+    <record id="cat_anti_inflammatoire" model="hospital.pharmacy.category">
+        <field name="name">Anti-inflammatoires et antihistaminiques</field>
+        <field name="sequence">70</field>
+    </record>
+
+    <record id="cat_vaccins" model="hospital.pharmacy.category">
+        <field name="name">Vaccins et immunsérums</field>
+        <field name="sequence">80</field>
+    </record>
+
+    <record id="cat_divers" model="hospital.pharmacy.category">
+        <field name="name">Divers</field>
+        <field name="sequence">999</field>
+    </record>
+
+    <!-- Niveau 2 : Sous-catégories - Système nerveux -->
+    <record id="cat_antalgiques" model="hospital.pharmacy.category">
+        <field name="name">Antalgiques</field>
+        <field name="parent_id" ref="cat_systeme_nerveux"/>
+        <field name="sequence">11</field>
+    </record>
+
+    <record id="cat_anxiolytiques" model="hospital.pharmacy.category">
+        <field name="name">Anxiolytiques et hypnotiques</field>
+        <field name="parent_id" ref="cat_systeme_nerveux"/>
+        <field name="sequence">12</field>
+    </record>
+
+    <record id="cat_antidepresseurs" model="hospital.pharmacy.category">
+        <field name="name">Antidépresseurs</field>
+        <field name="parent_id" ref="cat_systeme_nerveux"/>
+        <field name="sequence">13</field>
+    </record>
+
+    <record id="cat_antiepileptiques" model="hospital.pharmacy.category">
+        <field name="name">Antiépileptiques</field>
+        <field name="parent_id" ref="cat_systeme_nerveux"/>
+        <field name="sequence">14</field>
+    </record>
+
+    <!-- Niveau 2 : Sous-catégories - Cardiovasculaire -->
+    <record id="cat_antihypertenseurs" model="hospital.pharmacy.category">
+        <field name="name">Antihypertenseurs</field>
+        <field name="parent_id" ref="cat_systeme_cardiovasculaire"/>
+        <field name="sequence">21</field>
+    </record>
+
+    <record id="cat_diuretiques" model="hospital.pharmacy.category">
+        <field name="name">Diurétiques</field>
+        <field name="parent_id" ref="cat_systeme_cardiovasculaire"/>
+        <field name="sequence">22</field>
+    </record>
+
+    <record id="cat_anticoagulants" model="hospital.pharmacy.category">
+        <field name="name">Anticoagulants et antiagrégants</field>
+        <field name="parent_id" ref="cat_systeme_cardiovasculaire"/>
+        <field name="sequence">23</field>
+    </record>
+
+    <!-- Niveau 2 : Sous-catégories - Anti-infectieux -->
+    <record id="cat_antibiotiques" model="hospital.pharmacy.category">
+        <field name="name">Antibiotiques</field>
+        <field name="parent_id" ref="cat_anti_infectieux"/>
+        <field name="sequence">31</field>
+    </record>
+
+    <record id="cat_antiviraux" model="hospital.pharmacy.category">
+        <field name="name">Antiviraux</field>
+        <field name="parent_id" ref="cat_anti_infectieux"/>
+        <field name="sequence">32</field>
+    </record>
+
+    <record id="cat_antifongiques" model="hospital.pharmacy.category">
+        <field name="name">Antifongiques</field>
+        <field name="parent_id" ref="cat_anti_infectieux"/>
+        <field name="sequence">33</field>
+    </record>
+
+    <!-- Niveau 2 : Sous-catégories - Digestif -->
+    <record id="cat_antiacides" model="hospital.pharmacy.category">
+        <field name="name">Antiacides et antiulcéreux</field>
+        <field name="parent_id" ref="cat_systeme_digestif"/>
+        <field name="sequence">41</field>
+    </record>
+
+    <record id="cat_antiemetiques" model="hospital.pharmacy.category">
+        <field name="name">Antiémétiques</field>
+        <field name="parent_id" ref="cat_systeme_digestif"/>
+        <field name="sequence">42</field>
+    </record>
+
+    <record id="cat_antidiabetiques" model="hospital.pharmacy.category">
+        <field name="name">Antidiabétiques</field>
+        <field name="parent_id" ref="cat_systeme_endocrinien"/>
+        <field name="sequence">61</field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- MÉDICAMENTS DE DÉMONSTRATION                                         -->
+    <!-- =================================================================== -->
+
+    <!-- Antalgiques -->
+    <record id="med_paracetamol" model="hospital.pharmacy.medicament">
+        <field name="name">Doliprane</field>
+        <field name="active_ingredient">Paracétamol</field>
+        <field name="dosage">500 mg</field>
+        <field name="category_id" ref="cat_antalgiques"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Sanofi</field>
+        <field name="prescription_required">False</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">2.50</field>
+        <field name="alert_threshold">50</field>
+    </record>
+
+    <record id="med_ibuprofene" model="hospital.pharmacy.medicament">
+        <field name="name">Advil</field>
+        <field name="active_ingredient">Ibuprofène</field>
+        <field name="dosage">400 mg</field>
+        <field name="category_id" ref="cat_antalgiques"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Pfizer</field>
+        <field name="prescription_required">False</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">3.80</field>
+        <field name="alert_threshold">30</field>
+    </record>
+
+    <record id="med_morphine" model="hospital.pharmacy.medicament">
+        <field name="name">Morphine Aguettant</field>
+        <field name="active_ingredient">Morphine</field>
+        <field name="dosage">10 mg/ml</field>
+        <field name="category_id" ref="cat_antalgiques"/>
+        <field name="form">injectable</field>
+        <field name="administration_route">intravenous</field>
+        <field name="manufacturer">Laboratoire Aguettant</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">12.50</field>
+        <field name="alert_threshold">5</field>
+    </record>
+
+    <record id="med_tramadol" model="hospital.pharmacy.medicament">
+        <field name="name">Topalgic</field>
+        <field name="active_ingredient">Tramadol</field>
+        <field name="dosage">50 mg</field>
+        <field name="category_id" ref="cat_antalgiques"/>
+        <field name="form">capsule</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Sanofi</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">5.20</field>
+        <field name="alert_threshold">20</field>
+    </record>
+
+    <!-- Antibiotiques -->
+    <record id="med_amoxicilline" model="hospital.pharmacy.medicament">
+        <field name="name">Amoxicilline Sandoz</field>
+        <field name="active_ingredient">Amoxicilline</field>
+        <field name="dosage">500 mg</field>
+        <field name="category_id" ref="cat_antibiotiques"/>
+        <field name="form">capsule</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Sandoz</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">4.90</field>
+        <field name="alert_threshold">30</field>
+    </record>
+
+    <record id="med_azithromycine" model="hospital.pharmacy.medicament">
+        <field name="name">Zithromax</field>
+        <field name="active_ingredient">Azithromycine</field>
+        <field name="dosage">250 mg</field>
+        <field name="category_id" ref="cat_antibiotiques"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Pfizer</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">8.30</field>
+        <field name="alert_threshold">20</field>
+    </record>
+
+    <record id="med_ceftriaxone" model="hospital.pharmacy.medicament">
+        <field name="name">Ceftriaxone Mylan</field>
+        <field name="active_ingredient">Ceftriaxone</field>
+        <field name="dosage">1 g</field>
+        <field name="category_id" ref="cat_antibiotiques"/>
+        <field name="form">injectable</field>
+        <field name="administration_route">intravenous</field>
+        <field name="manufacturer">Mylan</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">15.00</field>
+        <field name="alert_threshold">10</field>
+    </record>
+
+    <!-- Antihypertenseurs -->
+    <record id="med_ramipril" model="hospital.pharmacy.medicament">
+        <field name="name">Triatec</field>
+        <field name="active_ingredient">Ramipril</field>
+        <field name="dosage">5 mg</field>
+        <field name="category_id" ref="cat_antihypertenseurs"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Sanofi</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">7.40</field>
+        <field name="alert_threshold">20</field>
+    </record>
+
+    <record id="med_amlodipine" model="hospital.pharmacy.medicament">
+        <field name="name">Amlor</field>
+        <field name="active_ingredient">Amlodipine</field>
+        <field name="dosage">5 mg</field>
+        <field name="category_id" ref="cat_antihypertenseurs"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Pfizer</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">6.80</field>
+        <field name="alert_threshold">20</field>
+    </record>
+
+    <!-- Antidiabétiques -->
+    <record id="med_metformine" model="hospital.pharmacy.medicament">
+        <field name="name">Glucophage</field>
+        <field name="active_ingredient">Metformine</field>
+        <field name="dosage">500 mg</field>
+        <field name="category_id" ref="cat_antidiabetiques"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Merck</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">5.60</field>
+        <field name="alert_threshold">30</field>
+    </record>
+
+    <!-- Anti-inflammatoires -->
+    <record id="med_prednisolone" model="hospital.pharmacy.medicament">
+        <field name="name">Solupred</field>
+        <field name="active_ingredient">Prednisolone</field>
+        <field name="dosage">20 mg</field>
+        <field name="category_id" ref="cat_anti_inflammatoire"/>
+        <field name="form">tablet</field>
+        <field name="administration_route">oral</field>
+        <field name="manufacturer">Sanofi</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">4.30</field>
+        <field name="alert_threshold">15</field>
+    </record>
+
+    <!-- Anticoagulants -->
+    <record id="med_heparine" model="hospital.pharmacy.medicament">
+        <field name="name">Héparine Calcique</field>
+        <field name="active_ingredient">Héparine</field>
+        <field name="dosage">5 000 UI/ml</field>
+        <field name="category_id" ref="cat_anticoagulants"/>
+        <field name="form">injectable</field>
+        <field name="administration_route">subcutaneous</field>
+        <field name="manufacturer">Sanofi</field>
+        <field name="prescription_required">True</field>
+        <field name="storage_conditions">ambient</field>
+        <field name="unit_price">18.00</field>
+        <field name="alert_threshold">10</field>
+    </record>
+
+</odoo>

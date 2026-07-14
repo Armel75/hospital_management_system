@@ -1,0 +1,27 @@
+# =============================================================================
+# .gitattributes — Centre Hospitalier
+# =============================================================================
+
+# Normaliser les fins de ligne
+* text=auto eol=lf
+
+# Fichiers Python
+*.py text diff=python
+
+# Fichiers XML Odoo
+*.xml text diff=xml
+
+# Fichiers CSV
+*.csv text
+
+# Fichiers de config
+*.conf text
+*.yml text
+*.yaml text
+*.cfg text
+
+# Fichiers binaires
+*.png binary
+*.jpg binary
+*.ico binary
+*.pdf binary

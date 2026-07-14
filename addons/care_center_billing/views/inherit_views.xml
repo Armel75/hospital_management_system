@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  HÉRITAGE VUE CONSULTATION - Ajout bouton Générer facture              #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_consultation_form_inherit_billing" model="ir.ui.view">
+        <field name="name">hospital.consultation.form.inherit.billing</field>
+        <field name="model">hospital.consultation</field>
+        <field name="inherit_id" ref="care_center_consultation.view_hospital_consultation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_medical_record']" position="after">
+                <button name="action_generate_invoice"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-euro"
+                        string="Facture"
+                        invisible="state not in ('done',)"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_invoice"
+                        type="object"
+                        string="Générer facture"
+                        class="btn-secondary"
+                        states="done"/>
+            </xpath>
+            <xpath expr="//field[@name='consultation_id']" position="after">
+                <field name="invoice_status" string="Facturation" widget="badge"
+                       decoration-success="invoice_status == 'invoiced'"
+                       decoration-warning="invoice_status == 'not_invoiced'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  HÉRITAGE VUE DÉLIVRANCE - Ajout bouton Générer facture                #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_pharmacy_dispensing_form_inherit_billing" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.dispensing.form.inherit.billing</field>
+        <field name="model">hospital.pharmacy.dispensing</field>
+        <field name="inherit_id" ref="care_center_pharmacy.view_hospital_pharmacy_dispensing_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_open_patient']" position="after">
+                <button name="action_generate_invoice"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-euro"
+                        string="Facture"
+                        invisible="state not in ('done',)"/>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_invoice"
+                        type="object"
+                        string="Générer facture"
+                        class="btn-secondary"
+                        states="done"/>
+            </xpath>
+            <xpath expr="//field[@name='consultation_id']" position="after">
+                <field name="invoice_status" string="Facturation" widget="badge"
+                       decoration-success="invoice_status == 'invoiced'"
+                       decoration-warning="invoice_status == 'not_invoiced'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  HÉRITAGE VUE PATIENT - Ajout infos assurance et facturation           #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_patient_form_inherit_billing" model="ir.ui.view">
+        <field name="name">hospital.patient.form.inherit.billing</field>
+        <field name="model">hospital.patient</field>
+        <field name="inherit_id" ref="care_center_base.view_hospital_patient_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@string='Notes']" position="before">
+                <page string="Facturation">
+                    <group string="Assurance">
+                        <group>
+                            <field name="insurance_id" options="{'no_create': True}"/>
+                            <field name="insurance_number"/>
+                        </group>
+                        <group>
+                            <field name="total_invoiced" widget="monetary" string="Total facturé"/>
+                            <field name="total_unpaid" widget="monetary" string="Impayé"
+                                   decoration-danger="total_unpaid &gt; 0"/>
+                        </group>
+                    </group>
+                    <separator string="Factures"/>
+                    <field name="invoice_ids" nolabel="1">
+                        <tree string="Factures">
+                            <field name="invoice_id"/>
+                            <field name="invoice_date"/>
+                            <field name="total_amount" widget="monetary"/>
+                            <field name="balance_due" widget="monetary"/>
+                            <field name="payment_status"/>
+                            <field name="state"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- LISTE (TREE) DOSSIER MÉDICAL                                         -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_medical_record_tree" model="ir.ui.view">
+        <field name="name">hospital.medical.record.tree</field>
+        <field name="model">hospital.medical.record</field>
+        <field name="arch" type="xml">
+            <tree string="Dossier médical" decoration-warning="severity == 'high'"
+                  decoration-danger="severity == 'critical'">
+                <field name="patient_id"/>
+                <field name="record_type"/>
+                <field name="pathology"/>
+                <field name="severity" widget="badge"/>
+                <field name="condition_active" widget="boolean_toggle"/>
+                <field name="date_recorded"/>
+                <field name="doctor_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- FORMULAIRE DOSSIER MÉDICAL                                           -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_medical_record_form" model="ir.ui.view">
+        <field name="name">hospital.medical.record.form</field>
+        <field name="model">hospital.medical.record</field>
+        <field name="arch" type="xml">
+            <form string="Dossier médical">
+                <header>
+                    <button name="action_toggle_active"
+                            type="object"
+                            invisible="record_type not in ('allergy', 'chronic_disease', 'treatment')"
+                            class="btn-secondary">
+                        <span invisible="condition_active == True">Réactiver</span>
+                        <span invisible="condition_active == False">Marquer inactif</span>
+                    </button>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="pathology" placeholder="Pathologie / Intitulé..."/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="patient_id" required="1"/>
+                            <field name="record_type" required="1"/>
+                            <field name="severity" widget="badge"/>
+                        </group>
+                        <group>
+                            <field name="date_recorded"/>
+                            <field name="doctor_id"/>
+                            <field name="condition_active" widget="boolean_toggle"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <group>
+                                <field name="description" nolabel="1" placeholder="Description détaillée..."/>
+                            </group>
+                            <group string="Période">
+                                <group>
+                                    <field name="date_onset"/>
+                                </group>
+                                <group>
+                                    <field name="date_resolution"
+                                           invisible="condition_active == True"/>
+                                </group>
+                            </group>
+                            <group string="Notes">
+                                <field name="notes" nolabel="1" placeholder="Notes complémentaires..."/>
+                            </group>
+                        </page>
+                        <page string="Documents">
+                            <field name="attachment_ids" widget="many2many_binary"
+                                   nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- RECHERCHE                                                            -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_medical_record_search" model="ir.ui.view">
+        <field name="name">hospital.medical.record.search</field>
+        <field name="model">hospital.medical.record</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher dans le dossier médical">
+                <field name="pathology"/>
+                <field name="patient_id"/>
+                <filter name="group_type"
+                        string="Type"
+                        context="{'group_by': 'record_type'}"/>
+                <filter name="active_conditions"
+                        string="Conditions actives"
+                        domain="[('condition_active','=',True)]"/>
+                <filter name="severity_critical"
+                        string="Critiques"
+                        domain="[('severity','=','critical')]"/>
+                <separator/>
+                <filter name="allergies"
+                        string="Allergies"
+                        domain="[('record_type','=','allergy')]"/>
+                <filter name="chronic"
+                        string="Maladies chroniques"
+                        domain="[('record_type','=','chronic_disease')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- ACTION WINDOW                                                        -->
+    <!-- =================================================================== -->
+    <record id="action_hospital_medical_record" model="ir.actions.act_window">
+        <field name="name">Dossiers médicaux</field>
+        <field name="res_model">hospital.medical.record</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_hospital_medical_record_search"/>
+    </record>
+
+</odoo>

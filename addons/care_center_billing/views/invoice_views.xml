@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  FACTURES                                                               #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_billing_invoice_tree" model="ir.ui.view">
+        <field name="name">hospital.billing.invoice.tree</field>
+        <field name="model">hospital.billing.invoice</field>
+        <field name="arch" type="xml">
+            <tree string="Factures"
+                  decoration-warning="state == 'draft'"
+                  decoration-success="payment_status == 'paid'"
+                  decoration-info="payment_status == 'partial'"
+                  decoration-danger="payment_status == 'unpaid' and state == 'confirmed'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="invoice_id" string="N°"/>
+                <field name="patient_id" string="Patient"/>
+                <field name="invoice_date" string="Date"/>
+                <field name="date_due" string="Échéance"/>
+                <field name="total_amount" string="Total €" widget="monetary" sum="Total"/>
+                <field name="insurance_amount" string="Assurance €" widget="monetary" sum="Total"/>
+                <field name="patient_amount" string="Patient €" widget="monetary" sum="Total"/>
+                <field name="paid_amount" string="Payé €" widget="monetary" sum="Total"/>
+                <field name="balance_due" string="Solde €" widget="monetary"
+                       decoration-danger="balance_due &gt; 0"/>
+                <field name="payment_status" string="Paiement" widget="badge"
+                       decoration-success="payment_status == 'paid'"
+                       decoration-info="payment_status == 'partial'"
+                       decoration-danger="payment_status == 'unpaid'"/>
+                <field name="state" string="Statut" widget="badge"
+                       decoration-success="state == 'confirmed'"
+                       decoration-info="state == 'draft'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hospital_billing_invoice_form" model="ir.ui.view">
+        <field name="name">hospital.billing.invoice.form</field>
+        <field name="model">hospital.billing.invoice</field>
+        <field name="arch" type="xml">
+            <form string="Facture">
+                <header>
+                    <button name="action_confirm"
+                            type="object"
+                            string="Confirmer"
+                            class="btn-primary"
+                            states="draft"/>
+                    <button name="action_register_payment"
+                            type="object"
+                            string="Enregistrer un paiement"
+                            class="btn-success"
+                            states="confirmed"/>
+                    <button name="action_cancel"
+                            type="object"
+                            string="Annuler"
+                            states="draft,confirmed"
+                            confirm="Êtes-vous sûr de vouloir annuler cette facture ?"/>
+                    <button name="action_draft"
+                            type="object"
+                            string="Réouvrir"
+                            states="cancelled"/>
+                    <field name="state" string="Statut" widget="statusbar"
+                           statusbar_visible="draft,confirmed"
+                           clickable="False"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_patient"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-user"
+                                string="Fiche patient"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="patient_id"
+                                   placeholder="Sélectionnez un patient..."
+                                   required="1"
+                                   class="oe_inline"
+                                   context="{'default_company_id': company_id}"/>
+                        </h1>
+                        <group>
+                            <div class="oe_inline">
+                                <field name="invoice_id" class="oe_inline"/>
+                            </div>
+                            <div class="oe_inline" groups="base.group_multi_company">
+                                <field name="company_id" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="invoice_date" required="1"/>
+                            <field name="date_due" required="1"/>
+                            <field name="consultation_id" options="{'no_create': True}"/>
+                            <field name="dispensing_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="insurance_id" options="{'no_create': True}"/>
+                            <field name="insurance_number"
+                                   attrs="{'invisible': [('insurance_id', '=', False)]}"/>
+                            <field name="coverage_rate" widget="statinfo"
+                                   attrs="{'invisible': [('insurance_id', '=', False)]}"/>
+                        </group>
+                    </group>
+
+                    <group string="Montants" class="oe_subtotal_footer">
+                        <group>
+                            <field name="total_amount" widget="monetary" class="oe_subtotal"/>
+                        </group>
+                        <group>
+                            <field name="insurance_amount" widget="monetary"/>
+                            <field name="patient_amount" widget="monetary" class="oe_subtotal"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Lignes de facture">
+                            <field name="line_ids" nolabel="1">
+                                <tree string="Lignes" editable="bottom">
+                                    <field name="description" required="1"/>
+                                    <field name="quantity" required="1"/>
+                                    <field name="unit_price" widget="monetary" required="1"/>
+                                    <field name="subtotal" widget="monetary" sum="Total"/>
+                                    <field name="source_model" invisible="1"/>
+                                    <field name="source_id" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Paiements">
+                            <group string="Récapitulatif">
+                                <group>
+                                    <field name="paid_amount" widget="statinfo"/>
+                                    <field name="balance_due" widget="statinfo"
+                                           decoration-danger="balance_due &gt; 0"/>
+                                </group>
+                                <group>
+                                    <field name="payment_status" widget="badge"/>
+                                </group>
+                            </group>
+                            <separator string="Paiements enregistrés"
+                                       invisible="not payment_ids"/>
+                            <field name="payment_ids" nolabel="1"
+                                   invisible="not payment_ids">
+                                <tree string="Paiements">
+                                    <field name="payment_date"/>
+                                    <field name="amount" widget="monetary" sum="Total"/>
+                                    <field name="payment_method"/>
+                                    <field name="reference"/>
+                                    <field name="user_id"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Notes">
+                            <group>
+                                <field name="notes" nolabel="1"
+                                       placeholder="Notes internes..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_billing_invoice_search" model="ir.ui.view">
+        <field name="name">hospital.billing.invoice.search</field>
+        <field name="model">hospital.billing.invoice</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher une facture">
+                <field name="invoice_id" string="N° Facture"
+                       filter_domain="[('invoice_id','ilike',self)]"/>
+                <field name="patient_id" string="Patient"/>
+                <field name="insurance_id" string="Assurance"/>
+                <separator/>
+                <filter name="state_draft"
+                        string="Brouillons"
+                        domain="[('state','=','draft')]"/>
+                <filter name="state_confirmed"
+                        string="Confirmées"
+                        domain="[('state','=','confirmed')]"/>
+                <filter name="unpaid"
+                        string="Impayées"
+                        domain="[('payment_status','=','unpaid'),('state','=','confirmed')]"/>
+                <filter name="partial"
+                        string="Partiellement payées"
+                        domain="[('payment_status','=','partial')]"/>
+                <filter name="overdue"
+                        string="En retard"
+                        domain="[('date_due','&lt;',context_today().strftime('%Y-%m-%d')),('payment_status','!=','paid'),('state','=','confirmed')]"/>
+                <separator/>
+                <filter name="group_state"
+                        string="Statut"
+                        context="{'group_by': 'state'}"/>
+                <filter name="group_payment"
+                        string="Paiement"
+                        context="{'group_by': 'payment_status'}"/>
+                <filter name="group_insurance"
+                        string="Assurance"
+                        context="{'group_by': 'insurance_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- VUE PIVOT / GRAPHIQUE                                                -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_billing_invoice_pivot" model="ir.ui.view">
+        <field name="name">hospital.billing.invoice.pivot</field>
+        <field name="model">hospital.billing.invoice</field>
+        <field name="arch" type="xml">
+            <pivot string="Statistiques de facturation">
+                <field name="insurance_id" type="row"/>
+                <field name="payment_status" type="row"/>
+                <field name="invoice_date" interval="month" type="col"/>
+                <field name="total_amount" type="measure" string="Total €"/>
+                <field name="insurance_amount" type="measure" string="Part assurance €"/>
+                <field name="patient_amount" type="measure" string="Part patient €"/>
+                <field name="balance_due" type="measure" string="Impayé €"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hospital_billing_invoice_graph" model="ir.ui.view">
+        <field name="name">hospital.billing.invoice.graph</field>
+        <field name="model">hospital.billing.invoice</field>
+        <field name="arch" type="xml">
+            <graph string="Chiffre d'affaires">
+                <field name="invoice_date" interval="month" type="row"/>
+                <field name="total_amount" type="measure" string="CA €"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- ACTION WINDOW                                                        -->
+    <!-- =================================================================== -->
+    <record id="action_hospital_billing_invoice" model="ir.actions.act_window">
+        <field name="name">Factures</field>
+        <field name="res_model">hospital.billing.invoice</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_hospital_billing_invoice_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Cliquez ici pour créer une nouvelle facture
+            </p>
+            <p>
+                Gérez la facturation des patients. Les factures peuvent être
+                générées automatiquement depuis les consultations et les
+                délivrances de médicaments.
+            </p>
+        </field>
+    </record>
+
+</odoo>

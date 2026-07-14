@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  ASSURANCES DE DÉMONSTRATION                                           #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="ins_cnss" model="hospital.billing.insurance">
+        <field name="name">CNSS</field>
+        <field name="code">CNSS</field>
+        <field name="coverage_rate">70.0</field>
+        <field name="coverage_type">percentage</field>
+    </record>
+
+    <record id="ins_mutuelle_generale" model="hospital.billing.insurance">
+        <field name="name">Mutuelle Générale</field>
+        <field name="code">MUT-GEN</field>
+        <field name="coverage_rate">80.0</field>
+        <field name="coverage_type">percentage</field>
+    </record>
+
+    <record id="ins_mutuelle_privée" model="hospital.billing.insurance">
+        <field name="name">Mutuelle Privée Premium</field>
+        <field name="code">MUT-PRE</field>
+        <field name="coverage_rate">100.0</field>
+        <field name="coverage_type">percentage</field>
+    </record>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  GRILLE TARIFAIRE DE DÉMONSTRATION                                     #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="rate_consultation" model="hospital.billing.rate">
+        <field name="name">Consultation générale</field>
+        <field name="code">CSG</field>
+        <field name="category">consultation</field>
+        <field name="default_price">30.00</field>
+        <field name="description">Consultation médicale générale</field>
+    </record>
+
+    <record id="rate_consultation_specialty" model="hospital.billing.rate">
+        <field name="name">Consultation spécialisée</field>
+        <field name="code">CSS</field>
+        <field name="category">specialty</field>
+        <field name="default_price">50.00</field>
+        <field name="description">Consultation chez un médecin spécialiste</field>
+    </record>
+
+    <record id="rate_emergency" model="hospital.billing.rate">
+        <field name="name">Passage aux urgences</field>
+        <field name="code">URG</field>
+        <field name="category">emergency</field>
+        <field name="default_price">75.00</field>
+        <field name="description">Passage et prise en charge aux urgences</field>
+    </record>
+
+    <record id="rate_consultation_control" model="hospital.billing.rate">
+        <field name="name">Consultation de contrôle</field>
+        <field name="code">CSC</field>
+        <field name="category">consultation</field>
+        <field name="default_price">25.00</field>
+        <field name="description">Consultation de suivi et de contrôle</field>
+    </record>
+
+</odoo>

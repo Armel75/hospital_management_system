@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- MENU PHARMACIE                                                       -->
+    <!-- =================================================================== -->
+
+    <!-- Menu racine Pharmacie -->
+    <menuitem id="menu_care_center_pharmacy_root"
+              name="Pharmacie"
+              parent="care_center_base.menu_care_center_root"
+              sequence="30"/>
+
+    <!-- Sous-menus -->
+    <menuitem id="menu_care_center_pharmacy_dispensing"
+              name="Délivrances"
+              parent="menu_care_center_pharmacy_root"
+              sequence="10"
+              action="action_hospital_pharmacy_dispensing"/>
+
+    <menuitem id="menu_care_center_pharmacy_medicaments"
+              name="Médicaments"
+              parent="menu_care_center_pharmacy_root"
+              sequence="20"
+              action="action_hospital_pharmacy_medicament"/>
+
+    <menuitem id="menu_care_center_pharmacy_lots"
+              name="Lots"
+              parent="menu_care_center_pharmacy_root"
+              sequence="30"
+              action="action_hospital_pharmacy_lot"/>
+
+    <menuitem id="menu_care_center_pharmacy_stock"
+              name="Mouvements de stock"
+              parent="menu_care_center_pharmacy_root"
+              sequence="40"
+              action="action_hospital_pharmacy_stock_move"/>
+
+    <menuitem id="menu_care_center_pharmacy_categories"
+              name="Catégories"
+              parent="menu_care_center_pharmacy_root"
+              sequence="50"
+              action="action_hospital_pharmacy_category"
+              groups="care_center_base.group_hospital_pharmacist,care_center_base.group_hospital_admin"/>
+
+</odoo>

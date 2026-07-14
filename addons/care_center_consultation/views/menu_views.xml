@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- MENU CONSULTATIONS                                                   -->
+    <!-- =================================================================== -->
+    <menuitem id="menu_care_center_consultations"
+              name="Consultations"
+              parent="care_center_base.menu_care_center_root"
+              sequence="15"
+              action="action_hospital_consultation"/>
+
+</odoo>

@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  CATÉGORIES                                                            #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_pharmacy_category_tree" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.category.tree</field>
+        <field name="model">hospital.pharmacy.category</field>
+        <field name="arch" type="xml">
+            <tree string="Catégories">
+                <field name="name" string="Catégorie"/>
+                <field name="parent_id" string="Catégorie parente"/>
+                <field name="medicament_count" string="Médicaments"/>
+                <field name="sequence" widget="handle"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_category_form" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.category.form</field>
+        <field name="model">hospital.pharmacy.category</field>
+        <field name="arch" type="xml">
+            <form string="Catégorie">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom de la catégorie..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="parent_id"
+                                   options="{'no_create': True}"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="medicament_count" widget="statinfo"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" nolabel="1"
+                               placeholder="Description de la catégorie..."/>
+                    </group>
+                    <separator string="Sous-catégories"/>
+                    <field name="child_ids" nolabel="1">
+                        <tree string="Sous-catégories">
+                            <field name="name"/>
+                            <field name="medicament_count"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_category_search" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.category.search</field>
+        <field name="model">hospital.pharmacy.category</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher une catégorie">
+                <field name="name"/>
+                <field name="parent_id"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hospital_pharmacy_category" model="ir.actions.act_window">
+        <field name="name">Catégories</field>
+        <field name="res_model">hospital.pharmacy.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_hospital_pharmacy_category_search"/>
+    </record>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  MÉDICAMENTS                                                            #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_pharmacy_medicament_tree" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.medicament.tree</field>
+        <field name="model">hospital.pharmacy.medicament</field>
+        <field name="arch" type="xml">
+            <tree string="Médicaments"
+                  decoration-danger="stock_alert == True">
+                <field name="display_name" string="Médicament"/>
+                <field name="category_id" string="Catégorie"/>
+                <field name="form" string="Forme"/>
+                <field name="dosage" string="Dosage"/>
+                <field name="total_stock" string="Stock" widget="statinfo"
+                       decoration-danger="stock_alert == True"/>
+                <field name="unit_price" string="Prix €" widget="monetary"/>
+                <field name="prescription_required" string="Presc." widget="boolean_toggle"/>
+                <field name="active" string="Actif" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_medicament_form" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.medicament.form</field>
+        <field name="model">hospital.pharmacy.medicament</field>
+        <field name="arch" type="xml">
+            <form string="Médicament">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_lots"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-cubes"
+                                string="Lots">
+                            <div class="o_stat_info">
+                                <field name="total_stock" widget="statinfo" string="Stock total"/>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nom commercial..."/>
+                        </h1>
+                        <group>
+                            <field name="display_name" invisible="1"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                    </div>
+
+                    <group string="Identification">
+                        <group>
+                            <field name="active_ingredient" placeholder="Principe actif (DCI)..."/>
+                            <field name="dosage" placeholder="Ex: 500 mg"/>
+                            <field name="category_id" required="1"/>
+                            <field name="atc_code" placeholder="Code ATC..."/>
+                        </group>
+                        <group>
+                            <field name="form" required="1"/>
+                            <field name="administration_route" required="1"/>
+                            <field name="manufacturer"/>
+                            <field name="prescription_required"/>
+                        </group>
+                    </group>
+
+                    <group string="Stock &amp; Prix">
+                        <group>
+                            <field name="total_stock" widget="statinfo"/>
+                            <field name="alert_threshold"/>
+                            <field name="storage_conditions"/>
+                        </group>
+                        <group>
+                            <field name="unit_price" widget="monetary"/>
+                            <field name="stock_alert" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Description">
+                        <field name="description" nolabel="1"
+                               placeholder="Description du médicament..."/>
+                    </group>
+
+                    <separator string="Lots"/>
+                    <field name="lot_ids" nolabel="1">
+                        <tree string="Lots" editable="bottom"
+                              decoration-danger="is_expired == True"
+                              decoration-warning="(days_until_expiry &gt; 0) and (days_until_expiry &lt; 30)"
+                              decoration-muted="state == 'depleted'">
+                            <field name="lot_number"/>
+                            <field name="current_quantity" string="Stock"/>
+                            <field name="initial_quantity" string="Initial"/>
+                            <field name="expiry_date"/>
+                            <field name="days_until_expiry" widget="statinfo"/>
+                            <field name="state" widget="badge"/>
+                            <field name="location"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_medicament_search" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.medicament.search</field>
+        <field name="model">hospital.pharmacy.medicament</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher un médicament">
+                <field name="display_name" string="Médicament"
+                       filter_domain="[('display_name','ilike',self)]"/>
+                <field name="active_ingredient" string="Principe actif"/>
+                <field name="category_id" string="Catégorie"/>
+                <field name="manufacturer" string="Laboratoire"/>
+                <separator/>
+                <filter name="stock_alert"
+                        string="Stock bas"
+                        domain="[('stock_alert','=',True)]"/>
+                <filter name="prescription"
+                        string="Sur prescription"
+                        domain="[('prescription_required','=',True)]"/>
+                <separator/>
+                <filter name="group_category"
+                        string="Catégorie"
+                        context="{'group_by': 'category_id'}"/>
+                <filter name="group_form"
+                        string="Forme"
+                        context="{'group_by': 'form'}"/>
+                <separator/>
+                <filter name="active_medicaments"
+                        string="Actifs"
+                        domain="[('active','=',True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hospital_pharmacy_medicament" model="ir.actions.act_window">
+        <field name="name">Médicaments</field>
+        <field name="res_model">hospital.pharmacy.medicament</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_hospital_pharmacy_medicament_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Ajoutez votre premier médicament
+            </p>
+            <p>
+                Gérez le catalogue de médicaments de votre pharmacie.
+                Chaque médicament peut avoir plusieurs lots avec suivi
+                des quantités et des dates de péremption.
+            </p>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  LOTS                                                                  #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_pharmacy_lot_tree" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.lot.tree</field>
+        <field name="model">hospital.pharmacy.lot</field>
+        <field name="arch" type="xml">
+            <tree string="Lots"
+                  decoration-danger="is_expired == True"
+                  decoration-warning="(days_until_expiry &gt; 0) and (days_until_expiry &lt; 30)"
+                  decoration-muted="state == 'depleted'"
+                  decoration-info="state == 'quarantined'">
+                <field name="medicament_id" string="Médicament"/>
+                <field name="lot_number" string="Lot"/>
+                <field name="current_quantity" string="Stock" widget="statinfo"/>
+                <field name="initial_quantity" string="Initial"/>
+                <field name="expiry_date" string="Péremption"/>
+                <field name="days_until_expiry" string="Jours rest." widget="statinfo"/>
+                <field name="state" string="État" widget="badge"/>
+                <field name="location" string="Emplacement"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_lot_form" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.lot.form</field>
+        <field name="model">hospital.pharmacy.lot</field>
+        <field name="arch" type="xml">
+            <form string="Lot">
+                <header>
+                    <button name="action_receive_stock"
+                            type="object"
+                            string="Réceptionner du stock"
+                            class="btn-primary"
+                            states="in_stock,low_stock,depleted"/>
+                    <field name="state" string="État" widget="statusbar"
+                           statusbar_visible="in_stock,low_stock,depleted,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_stock_moves"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                string="Mouvements"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="medicament_id" required="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Identification">
+                            <field name="lot_number" required="1"/>
+                            <field name="location" placeholder="Ex: A-12, Réfrigérateur 2"/>
+                            <field name="active" widget="boolean_toggle"/>
+                        </group>
+                        <group string="Quantités">
+                            <field name="initial_quantity" widget="statinfo"/>
+                            <field name="current_quantity" widget="statinfo"/>
+                            <field name="purchase_price" widget="monetary"/>
+                        </group>
+                        <group string="Dates">
+                            <field name="manufacturing_date"/>
+                            <field name="expiry_date" required="1"
+                                   attrs="{'invisible': [('is_expired', '=', True)]}"/>
+                            <field name="days_until_expiry" widget="statinfo"/>
+                            <field name="is_expired" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+
+                    <separator string="Mouvements de stock"/>
+                    <field name="stock_move_ids" nolabel="1">
+                        <tree string="Mouvements">
+                            <field name="date"/>
+                            <field name="move_type"/>
+                            <field name="quantity"/>
+                            <field name="reference"/>
+                            <field name="user_id"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_lot_search" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.lot.search</field>
+        <field name="model">hospital.pharmacy.lot</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher un lot">
+                <field name="lot_number" string="N° Lot"/>
+                <field name="medicament_id" string="Médicament"/>
+                <field name="location" string="Emplacement"/>
+                <separator/>
+                <filter name="in_stock"
+                        string="En stock"
+                        domain="[('state','=','in_stock')]"/>
+                <filter name="low_stock"
+                        string="Stock faible"
+                        domain="[('state','=','low_stock')]"/>
+                <filter name="expired"
+                        string="Périmés"
+                        domain="[('is_expired','=',True)]"/>
+                <filter name="expiring_soon"
+                        string="Péremption &lt; 30 jours"
+                        domain="[('days_until_expiry','&gt;',0),('days_until_expiry','&lt;',30)]"/>
+                <separator/>
+                <filter name="group_medicament"
+                        string="Médicament"
+                        context="{'group_by': 'medicament_id'}"/>
+                <filter name="group_state"
+                        string="État"
+                        context="{'group_by': 'state'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hospital_pharmacy_lot" model="ir.actions.act_window">
+        <field name="name">Lots</field>
+        <field name="res_model">hospital.pharmacy.lot</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_hospital_pharmacy_lot_search"/>
+    </record>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  MOUVEMENTS DE STOCK                                                   #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_pharmacy_stock_move_tree" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.stock.move.tree</field>
+        <field name="model">hospital.pharmacy.stock.move</field>
+        <field name="arch" type="xml">
+            <tree string="Mouvements de stock"
+                  decoration-success="move_type == 'inbound'"
+                  decoration-danger="move_type == 'outbound'"
+                  decoration-info="move_type == 'adjustment'">
+                <field name="date" string="Date"/>
+                <field name="medicament_id" string="Médicament"/>
+                <field name="lot_id" string="Lot"/>
+                <field name="move_type" string="Type" widget="badge"/>
+                <field name="quantity" string="Qté" sum="Qté totale"/>
+                <field name="reference" string="Référence"/>
+                <field name="user_id" string="Responsable"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_stock_move_form" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.stock.move.form</field>
+        <field name="model">hospital.pharmacy.stock.move</field>
+        <field name="arch" type="xml">
+            <form string="Mouvement de stock">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="reference" placeholder="Référence..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="lot_id" required="1"/>
+                            <field name="medicament_id" invisible="1"/>
+                            <field name="move_type" required="1"/>
+                            <field name="quantity" required="1"/>
+                        </group>
+                        <group>
+                            <field name="date" required="1"/>
+                            <field name="user_id"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_stock_move_search" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.stock.move.search</field>
+        <field name="model">hospital.pharmacy.stock.move</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher un mouvement">
+                <field name="reference"/>
+                <field name="medicament_id"/>
+                <field name="lot_id"/>
+                <filter name="inbound"
+                        string="Entrées"
+                        domain="[('move_type','=','inbound')]"/>
+                <filter name="outbound"
+                        string="Sorties"
+                        domain="[('move_type','=','outbound')]"/>
+                <filter name="today"
+                        string="Aujourd'hui"
+                        date="date"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_hospital_pharmacy_stock_move" model="ir.actions.act_window">
+        <field name="name">Mouvements de stock</field>
+        <field name="res_model">hospital.pharmacy.stock.move</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_hospital_pharmacy_stock_move_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Aucun mouvement de stock
+            </p>
+            <p>
+                Les mouvements de stock sont créés automatiquement
+                lors des délivrances et des réceptions de stock.
+            </p>
+        </field>
+    </record>
+
+</odoo>

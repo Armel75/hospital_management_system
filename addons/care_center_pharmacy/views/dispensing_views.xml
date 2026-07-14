@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    #                                                                       #
+    #  DÉLIVRANCES                                                           #
+    #                                                                       #
+    <!-- =================================================================== -->
+
+    <record id="view_hospital_pharmacy_dispensing_tree" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.dispensing.tree</field>
+        <field name="model">hospital.pharmacy.dispensing</field>
+        <field name="arch" type="xml">
+            <tree string="Délivrances"
+                  decoration-warning="state == 'draft'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="dispensing_id" string="N°"/>
+                <field name="patient_id" string="Patient"/>
+                <field name="pharmacist_id" string="Pharmacien"/>
+                <field name="doctor_id" string="Prescripteur"/>
+                <field name="dispensing_date" string="Date"/>
+                <field name="line_count" string="Articles"/>
+                <field name="total_amount" string="Total €" widget="monetary" sum="Total"/>
+                <field name="state" string="Statut" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-info="state == 'draft'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="company_id" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_dispensing_form" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.dispensing.form</field>
+        <field name="model">hospital.pharmacy.dispensing</field>
+        <field name="arch" type="xml">
+            <form string="Délivrance de médicaments">
+                <header>
+                    <button name="action_confirm"
+                            type="object"
+                            string="Confirmer"
+                            class="btn-primary"
+                            states="draft"/>
+                    <button name="action_done"
+                            type="object"
+                            string="Marquer délivré"
+                            class="btn-success"
+                            states="confirmed"/>
+                    <button name="action_cancel"
+                            type="object"
+                            string="Annuler"
+                            states="draft,confirmed"
+                            confirm="Êtes-vous sûr de vouloir annuler cette délivrance ?"/>
+                    <button name="action_draft"
+                            type="object"
+                            string="Réouvrir"
+                            states="cancelled"/>
+                    <field name="state" string="Statut" widget="statusbar"
+                           statusbar_visible="draft,confirmed,done"
+                           clickable="False"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_patient"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-user"
+                                string="Fiche patient"/>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="patient_id"
+                                   placeholder="Sélectionnez un patient..."
+                                   required="1"
+                                   class="oe_inline"
+                                   context="{'default_company_id': company_id}"/>
+                        </h1>
+                        <group>
+                            <div class="oe_inline">
+                                <field name="dispensing_id" class="oe_inline"/>
+                            </div>
+                            <div class="oe_inline" groups="base.group_multi_company">
+                                <field name="company_id" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="pharmacist_id" required="1"/>
+                            <field name="doctor_id" options="{'no_create': True}"/>
+                            <field name="consultation_id" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="dispensing_date" required="1"/>
+                            <field name="line_count" widget="statinfo"/>
+                            <field name="total_amount" widget="monetary"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Médicaments délivrés">
+                            <field name="line_ids" nolabel="1">
+                                <tree string="Lignes" editable="bottom"
+                                      decoration-danger="lot_available &lt; quantity">
+                                    <field name="medicament_id" required="1"
+                                           options="{'no_create': True}"/>
+                                    <field name="lot_id" required="1"
+                                           options="{'no_create': True}"
+                                           domain="[('medicament_id', '=', parent.medicament_id)]"/>
+                                    <field name="lot_expiry" optional="show"/>
+                                    <field name="lot_available" string="Dispo" optional="show"/>
+                                    <field name="quantity" required="1"/>
+                                    <field name="unit_price" widget="monetary"/>
+                                    <field name="subtotal" widget="monetary" sum="Total"/>
+                                    <field name="posology" optional="show"/>
+                                    <field name="duration_days" optional="hide"/>
+                                    <field name="notes" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <group>
+                                <field name="notes" nolabel="1"
+                                       placeholder="Notes internes..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_dispensing_search" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.dispensing.search</field>
+        <field name="model">hospital.pharmacy.dispensing</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher une délivrance">
+                <field name="dispensing_id" string="N° Délivrance"
+                       filter_domain="[('dispensing_id','ilike',self)]"/>
+                <field name="patient_id" string="Patient"/>
+                <field name="pharmacist_id" string="Pharmacien"/>
+                <field name="doctor_id" string="Prescripteur"/>
+                <separator/>
+                <filter name="state_draft"
+                        string="Brouillons"
+                        domain="[('state','=','draft')]"/>
+                <filter name="state_done"
+                        string="Délivrés"
+                        domain="[('state','=','done')]"/>
+                <filter name="today"
+                        string="Aujourd'hui"
+                        date="dispensing_date"/>
+                <separator/>
+                <filter name="group_state"
+                        string="Statut"
+                        context="{'group_by': 'state'}"/>
+                <filter name="group_pharmacist"
+                        string="Pharmacien"
+                        context="{'group_by': 'pharmacist_id'}"/>
+                <filter name="group_date"
+                        string="Date"
+                        context="{'group_by': 'dispensing_date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- VUE PIVOT / GRAPHIQUE                                                -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_pharmacy_dispensing_pivot" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.dispensing.pivot</field>
+        <field name="model">hospital.pharmacy.dispensing</field>
+        <field name="arch" type="xml">
+            <pivot string="Statistiques des délivrances">
+                <field name="pharmacist_id" type="row"/>
+                <field name="state" type="row"/>
+                <field name="dispensing_date" interval="month" type="col"/>
+                <field name="total_amount" type="measure" string="Total €"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hospital_pharmacy_dispensing_graph" model="ir.ui.view">
+        <field name="name">hospital.pharmacy.dispensing.graph</field>
+        <field name="model">hospital.pharmacy.dispensing</field>
+        <field name="arch" type="xml">
+            <graph string="Évolution des délivrances">
+                <field name="dispensing_date" interval="month" type="row"/>
+                <field name="total_amount" type="measure" string="Total €"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- ACTION WINDOW                                                        -->
+    <!-- =================================================================== -->
+    <record id="action_hospital_pharmacy_dispensing" model="ir.actions.act_window">
+        <field name="name">Délivrances</field>
+        <field name="res_model">hospital.pharmacy.dispensing</field>
+        <field name="view_mode">tree,form,pivot,graph</field>
+        <field name="search_view_id" ref="view_hospital_pharmacy_dispensing_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Cliquez ici pour créer une nouvelle délivrance
+            </p>
+            <p>
+                Gérez la délivrance de médicaments aux patients.
+                Chaque délivrance génère automatiquement les mouvements
+                de stock et met à jour les quantités disponibles.
+            </p>
+        </field>
+    </record>
+
+</odoo>

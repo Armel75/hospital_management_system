@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- LISTE (TREE) CONSULTATIONS                                           -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_consultation_tree" model="ir.ui.view">
+        <field name="name">hospital.consultation.tree</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <tree string="Consultations"
+                  decoration-warning="state == 'draft'"
+                  decoration-info="state == 'in_progress'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="consultation_id" string="N°"/>
+                <field name="patient_id" string="Patient"/>
+                <field name="doctor_id" string="Médecin"/>
+                <field name="consultation_date" string="Date"/>
+                <field name="state" string="Statut" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'in_progress'"
+                       decoration-info="state == 'draft'"
+                       decoration-danger="state == 'cancelled'"/>
+                <field name="reason" string="Motif"/>
+                <field name="diagnosis" string="Diagnostic"/>
+                <field name="company_id" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- FORMULAIRE CONSULTATION                                              -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_consultation_form" model="ir.ui.view">
+        <field name="name">hospital.consultation.form</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <form string="Consultation">
+                <header>
+                    <button name="action_start"
+                            type="object"
+                            string="Démarrer"
+                            class="btn-primary"
+                            states="draft"/>
+                    <button name="action_done"
+                            type="object"
+                            string="Terminer"
+                            class="btn-success"
+                            states="in_progress"/>
+                    <button name="action_cancel"
+                            type="object"
+                            string="Annuler"
+                            states="draft,in_progress"
+                            confirm="Êtes-vous sûr de vouloir annuler cette consultation ?"/>
+                    <button name="action_draft"
+                            type="object"
+                            string="Réouvrir"
+                            states="cancelled"/>
+                    <field name="state" string="Statut" widget="statusbar"
+                           statusbar_visible="draft,in_progress,done"
+                           clickable="False"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_patient"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-user"
+                                string="Fiche patient">
+                            <div class="o_stat_info">
+                                <field name="patient_age_at_consultation"
+                                       widget="statinfo"
+                                       string="Âge"/>
+                            </div>
+                        </button>
+                        <button name="action_open_medical_record"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-heartbeat"
+                                string="DME lié"/>
+                    </div>
+
+                    <!-- En-tête -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="patient_id"
+                                   placeholder="Sélectionnez un patient..."
+                                   required="1"
+                                   class="oe_inline"
+                                   context="{'default_company_id': company_id}"/>
+                        </h1>
+                        <group>
+                            <div class="oe_inline">
+                                <field name="consultation_id" class="oe_inline"/>
+                            </div>
+                            <div class="oe_inline" groups="base.group_multi_company">
+                                <field name="company_id" class="oe_inline"/>
+                            </div>
+                        </group>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="doctor_id" required="1"
+                                   options="{'no_create': True}"/>
+                            <field name="consultation_date" required="1"/>
+                            <field name="duration_minutes"/>
+                        </group>
+                        <group>
+                            <field name="patient_sex" widget="badge"/>
+                            <field name="patient_age_at_consultation" widget="statinfo"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <!-- ONGLET : Motif & Anamnèse -->
+                        <page string="Motif &amp; Anamnèse">
+                            <group>
+                                <field name="reason" nolabel="1"
+                                       placeholder="Motif de la consultation..."
+                                       required="1"/>
+                            </group>
+                            <group string="Symptômes et Anamnèse">
+                                <group>
+                                    <field name="symptoms" nolabel="1"
+                                           placeholder="Symptômes rapportés par le patient..."/>
+                                </group>
+                                <group>
+                                    <field name="anamnesis" nolabel="1"
+                                           placeholder="Anamnèse - interrogatoire médical, histoire de la maladie..."/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ONGLET : Constantes vitales -->
+                        <page string="Constantes vitales"
+                              groups="care_center_base.group_hospital_nurse,care_center_base.group_hospital_doctor">
+                            <group string="Tension artérielle">
+                                <group>
+                                    <field name="blood_pressure_systolic"
+                                           placeholder="Systolique"/>
+                                    <field name="blood_pressure_diastolic"
+                                           placeholder="Diastolique"/>
+                                </group>
+                                <group>
+                                    <field name="blood_pressure_display"
+                                           widget="statinfo"
+                                           string="Résultat"/>
+                                </group>
+                            </group>
+                            <group string="Signes vitaux">
+                                <group>
+                                    <field name="heart_rate" placeholder="120"/>
+                                    <field name="temperature" placeholder="37.5"/>
+                                    <field name="respiratory_rate" placeholder="16"/>
+                                </group>
+                                <group>
+                                    <field name="oxygen_saturation" placeholder="98"/>
+                                    <field name="weight" placeholder="70"/>
+                                    <field name="height" placeholder="175"/>
+                                </group>
+                                <group>
+                                    <field name="bmi" widget="statinfo"/>
+                                    <field name="glycemia" placeholder="1.0"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ONGLET : Diagnostic & traitement -->
+                        <page string="Diagnostic &amp; Traitement">
+                            <group string="Diagnostic">
+                                <field name="diagnosis" nolabel="1"
+                                       placeholder="Diagnostic posé..."/>
+                            </group>
+                            <group string="Plan de traitement">
+                                <field name="treatment_plan" nolabel="1"
+                                       placeholder="Prescriptions, examens complémentaires, recommandations..."/>
+                            </group>
+                            <group string="Entrées DME créées"
+                                   invisible="not medical_record_ids">
+                                <field name="medical_record_ids" nolabel="1">
+                                    <tree string="Entrées du DME">
+                                        <field name="record_type"/>
+                                        <field name="pathology"/>
+                                        <field name="severity" widget="badge"/>
+                                        <field name="date_recorded"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+
+                        <!-- ONGLET : Notes -->
+                        <page string="Notes">
+                            <group>
+                                <field name="notes" nolabel="1"
+                                       placeholder="Notes internes..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- RECHERCHE CONSULTATIONS                                              -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_consultation_search" model="ir.ui.view">
+        <field name="name">hospital.consultation.search</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <search string="Rechercher une consultation">
+                <field name="consultation_id" string="N° Consultation"
+                       filter_domain="[('consultation_id','ilike',self)]"/>
+                <field name="patient_id" string="Patient"/>
+                <field name="doctor_id" string="Médecin"/>
+                <field name="reason" string="Motif"
+                       filter_domain="[('reason','ilike',self)]"/>
+                <field name="diagnosis" string="Diagnostic"
+                       filter_domain="[('diagnosis','ilike',self)]"/>
+                <separator/>
+                <filter name="state_draft"
+                        string="Brouillons"
+                        domain="[('state','=','draft')]"
+                        help="Consultations en brouillon"/>
+                <filter name="state_in_progress"
+                        string="En cours"
+                        domain="[('state','=','in_progress')]"
+                        help="Consultations en cours"/>
+                <filter name="state_done"
+                        string="Terminées"
+                        domain="[('state','=','done')]"
+                        help="Consultations terminées"/>
+                <separator/>
+                <filter name="group_state"
+                        string="Statut"
+                        context="{'group_by': 'state'}"/>
+                <filter name="group_doctor"
+                        string="Médecin"
+                        context="{'group_by': 'doctor_id'}"/>
+                <filter name="group_date"
+                        string="Date"
+                        context="{'group_by': 'consultation_date'}"/>
+                <separator/>
+                <filter name="today"
+                        string="Aujourd'hui"
+                        help="Consultations du jour"
+                        date="consultation_date"/>
+                <filter name="this_week"
+                        string="Cette semaine"
+                        help="Consultations de la semaine"
+                        date="consultation_date"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- VUE KANBAN CONSULTATIONS                                             -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_consultation_kanban" model="ir.ui.view">
+        <field name="name">hospital.consultation.kanban</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <kanban string="Consultations" class="o_kanban_mobile">
+                <field name="consultation_id"/>
+                <field name="patient_id"/>
+                <field name="doctor_id"/>
+                <field name="state"/>
+                <field name="consultation_date"/>
+                <field name="reason"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click #{kanban_get_color(kanban_getcol('doctor_id'))}">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('hospital.patient', 'image_128', record.patient_id.raw_value)"
+                                     t-att-alt="record.patient_id.value"
+                                     class="o_image_64_cover"
+                                     width="64" height="64"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="patient_id"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="consultation_id"/>
+                                </div>
+                                <div class="o_kanban_record_body">
+                                    <field name="state" widget="badge"/>
+                                    <div>
+                                        <i class="fa fa-user-md"/>
+                                        <field name="doctor_id"/>
+                                    </div>
+                                    <div>
+                                        <i class="fa fa-calendar"/>
+                                        <field name="consultation_date"/>
+                                    </div>
+                                    <div t-if="record.reason.raw_value">
+                                        <i class="fa fa-question-circle"/>
+                                        <field name="reason"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- VUE PIVOT / GRAPHIQUE                                                -->
+    <!-- =================================================================== -->
+    <record id="view_hospital_consultation_pivot" model="ir.ui.view">
+        <field name="name">hospital.consultation.pivot</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <pivot string="Statistiques des consultations">
+                <field name="doctor_id" type="row"/>
+                <field name="state" type="row"/>
+                <field name="consultation_date" interval="month" type="col"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_hospital_consultation_graph" model="ir.ui.view">
+        <field name="name">hospital.consultation.graph</field>
+        <field name="model">hospital.consultation</field>
+        <field name="arch" type="xml">
+            <graph string="Évolution des consultations">
+                <field name="consultation_date" interval="month" type="row"/>
+                <field name="doctor_id" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <!-- =================================================================== -->
+    <!-- ACTION WINDOW                                                        -->
+    <!-- =================================================================== -->
+    <record id="action_hospital_consultation" model="ir.actions.act_window">
+        <field name="name">Consultations</field>
+        <field name="res_model">hospital.consultation</field>
+        <field name="view_mode">tree,form,kanban,pivot,graph</field>
+        <field name="search_view_id" ref="view_hospital_consultation_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Cliquez ici pour créer une nouvelle consultation
+            </p>
+            <p>
+                Gérez les consultations médicales de votre établissement.
+                Enregistrez les motifs, symptômes, constantes vitales,
+                diagnostics et plans de traitement.
+            </p>
+        </field>
+    </record>
+
+</odoo>

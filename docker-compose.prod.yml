@@ -1,0 +1,67 @@
+# =============================================================================
+# docker-compose.prod.yml — Production
+# =============================================================================
+# Usage : docker compose -f docker-compose.prod.yml up -d
+#
+# Différences avec docker-compose.yml (dev) :
+#   - Build depuis le Dockerfile (image figée, pas de volume addons)
+#   - Politique de redémarrage automatique (always)
+#   - Pas de ports exposés sur la DB (sécurité)
+#   - Logging limité (prévention saturation disque)
+# =============================================================================
+
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-odoo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  odoo:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - "${ODOO_HOST_PORT:-8069}:8069"
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
+    environment:
+      HOST: db
+      USER: ${POSTGRES_USER:-odoo}
+      PASSWORD: ${POSTGRES_PASSWORD:-odoo}
+    restart: always
+    mem_limit: 2g
+    cpus: '2.0'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "pidof", "odoo"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  postgres-data:
+  odoo-data:

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- MENU FACTURATION                                                     -->
+    <!-- =================================================================== -->
+
+    <menuitem id="menu_care_center_billing_root"
+              name="Facturation"
+              parent="care_center_base.menu_care_center_root"
+              sequence="40"
+              groups="care_center_base.group_hospital_manager,care_center_base.group_hospital_admin"/>
+
+    <menuitem id="menu_care_center_billing_invoices"
+              name="Factures"
+              parent="menu_care_center_billing_root"
+              sequence="10"
+              action="action_hospital_billing_invoice"/>
+
+    <menuitem id="menu_care_center_billing_payments"
+              name="Paiements"
+              parent="menu_care_center_billing_root"
+              sequence="20"
+              action="action_hospital_billing_payment"/>
+
+    <menuitem id="menu_care_center_billing_rates"
+              name="Grille tarifaire"
+              parent="menu_care_center_billing_root"
+              sequence="30"
+              action="action_hospital_billing_rate"/>
+
+    <menuitem id="menu_care_center_billing_insurances"
+              name="Assurances"
+              parent="menu_care_center_billing_root"
+              sequence="40"
+              action="action_hospital_billing_insurance"/>
+
+</odoo>

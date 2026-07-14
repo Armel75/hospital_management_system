@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- =================================================================== -->
+    <!-- MENU RENDEZ-VOUS                                                     -->
+    <!-- =================================================================== -->
+    <menuitem id="menu_care_center_appointments"
+              name="Rendez-vous"
+              parent="care_center_base.menu_care_center_root"
+              sequence="12"
+              action="action_hospital_appointment"/>
+
+    <!-- =================================================================== -->
+    <!-- MENU AGENDA PERSONNEL (visible uniquement pour le médecin connecté)  -->
+    <!-- =================================================================== -->
+    <menuitem id="menu_care_center_my_agenda"
+              name="Mon agenda"
+              parent="care_center_base.menu_care_center_root"
+              sequence="13"
+              action="action_hospital_appointment_agenda"
+              groups="care_center_base.group_hospital_doctor"/>
+
+</odoo>

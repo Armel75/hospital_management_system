@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hospital_patient_all,patient.all,model_hospital_patient,base.group_user,1,0,0,0
+access_hospital_patient_system,patient.system,model_hospital_patient,base.group_system,1,1,1,1
+access_hospital_patient_secretary,patient.secretary,model_hospital_patient,group_hospital_secretary,1,1,1,0
+access_hospital_patient_nurse,patient.nurse,model_hospital_patient,group_hospital_nurse,1,1,1,0
+access_hospital_patient_doctor,patient.doctor,model_hospital_patient,group_hospital_doctor,1,1,1,1
+access_hospital_patient_manager,patient.manager,model_hospital_patient,group_hospital_manager,1,1,1,1
+access_hospital_medical_record_all,medical.record.all,model_hospital_medical_record,base.group_user,1,0,0,0
+access_hospital_medical_record_system,medical.record.system,model_hospital_medical_record,base.group_system,1,1,1,1
+access_hospital_medical_record_secretary,medical.record.secretary,model_hospital_medical_record,group_hospital_secretary,1,1,1,0
+access_hospital_medical_record_nurse,medical.record.nurse,model_hospital_medical_record,group_hospital_nurse,1,1,1,0
+access_hospital_medical_record_doctor,medical.record.doctor,model_hospital_medical_record,group_hospital_doctor,1,1,1,1
+access_hospital_medical_record_manager,medical.record.manager,model_hospital_medical_record,group_hospital_manager,1,1,1,1

@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hospital_appointment_all,appointment.all,model_hospital_appointment,base.group_user,1,0,0,0
+access_hospital_appointment_system,appointment.system,model_hospital_appointment,base.group_system,1,1,1,1
+access_hospital_appointment_secretary,appointment.secretary,model_hospital_appointment,care_center_base.group_hospital_secretary,1,1,1,1
+access_hospital_appointment_nurse,appointment.nurse,model_hospital_appointment,care_center_base.group_hospital_nurse,1,1,1,1
+access_hospital_appointment_doctor,appointment.doctor,model_hospital_appointment,care_center_base.group_hospital_doctor,1,1,1,1
+access_hospital_appointment_pharmacist,appointment.pharmacist,model_hospital_appointment,care_center_base.group_hospital_pharmacist,1,0,0,0
+access_hospital_appointment_manager,appointment.manager,model_hospital_appointment,care_center_base.group_hospital_manager,1,1,1,1
