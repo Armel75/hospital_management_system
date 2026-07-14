@@ -9,7 +9,7 @@
 # exacte de l'environnement de développement.
 # =============================================================================
 
-FROM odoo:17
+FROM odoo:19
 
 USER root
 
