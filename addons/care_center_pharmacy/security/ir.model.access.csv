@@ -1,5 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-# Catégories
 access_hospital_pharmacy_category_all,categ.all,model_hospital_pharmacy_category,base.group_user,1,0,0,0
 access_hospital_pharmacy_category_system,categ.system,model_hospital_pharmacy_category,base.group_system,1,1,1,1
 access_hospital_pharmacy_category_secretary,categ.secretary,model_hospital_pharmacy_category,care_center_base.group_hospital_secretary,1,0,0,0
@@ -7,8 +6,6 @@ access_hospital_pharmacy_category_nurse,categ.nurse,model_hospital_pharmacy_cate
 access_hospital_pharmacy_category_doctor,categ.doctor,model_hospital_pharmacy_category,care_center_base.group_hospital_doctor,1,0,0,0
 access_hospital_pharmacy_category_pharmacist,categ.pharmacist,model_hospital_pharmacy_category,care_center_base.group_hospital_pharmacist,1,1,1,1
 access_hospital_pharmacy_category_manager,categ.manager,model_hospital_pharmacy_category,care_center_base.group_hospital_manager,1,1,1,1
-
-# Médicaments
 access_hospital_pharmacy_medicament_all,medicament.all,model_hospital_pharmacy_medicament,base.group_user,1,0,0,0
 access_hospital_pharmacy_medicament_system,medicament.system,model_hospital_pharmacy_medicament,base.group_system,1,1,1,1
 access_hospital_pharmacy_medicament_secretary,medicament.secretary,model_hospital_pharmacy_medicament,care_center_base.group_hospital_secretary,1,0,0,0
@@ -16,8 +13,6 @@ access_hospital_pharmacy_medicament_nurse,medicament.nurse,model_hospital_pharma
 access_hospital_pharmacy_medicament_doctor,medicament.doctor,model_hospital_pharmacy_medicament,care_center_base.group_hospital_doctor,1,0,0,0
 access_hospital_pharmacy_medicament_pharmacist,medicament.pharmacist,model_hospital_pharmacy_medicament,care_center_base.group_hospital_pharmacist,1,1,1,1
 access_hospital_pharmacy_medicament_manager,medicament.manager,model_hospital_pharmacy_medicament,care_center_base.group_hospital_manager,1,1,1,1
-
-# Lots
 access_hospital_pharmacy_lot_all,lot.all,model_hospital_pharmacy_lot,base.group_user,1,0,0,0
 access_hospital_pharmacy_lot_system,lot.system,model_hospital_pharmacy_lot,base.group_system,1,1,1,1
 access_hospital_pharmacy_lot_secretary,lot.secretary,model_hospital_pharmacy_lot,care_center_base.group_hospital_secretary,1,0,0,0
@@ -25,8 +20,6 @@ access_hospital_pharmacy_lot_nurse,lot.nurse,model_hospital_pharmacy_lot,care_ce
 access_hospital_pharmacy_lot_doctor,lot.doctor,model_hospital_pharmacy_lot,care_center_base.group_hospital_doctor,1,0,0,0
 access_hospital_pharmacy_lot_pharmacist,lot.pharmacist,model_hospital_pharmacy_lot,care_center_base.group_hospital_pharmacist,1,1,1,1
 access_hospital_pharmacy_lot_manager,lot.manager,model_hospital_pharmacy_lot,care_center_base.group_hospital_manager,1,1,1,1
-
-# Mouvements de stock
 access_hospital_pharmacy_stock_move_all,stock.move.all,model_hospital_pharmacy_stock_move,base.group_user,1,0,0,0
 access_hospital_pharmacy_stock_move_system,stock.move.system,model_hospital_pharmacy_stock_move,base.group_system,1,1,1,1
 access_hospital_pharmacy_stock_move_secretary,stock.move.secretary,model_hospital_pharmacy_stock_move,care_center_base.group_hospital_secretary,1,0,0,0
@@ -34,8 +27,6 @@ access_hospital_pharmacy_stock_move_nurse,stock.move.nurse,model_hospital_pharma
 access_hospital_pharmacy_stock_move_doctor,stock.move.doctor,model_hospital_pharmacy_stock_move,care_center_base.group_hospital_doctor,1,0,0,0
 access_hospital_pharmacy_stock_move_pharmacist,stock.move.pharmacist,model_hospital_pharmacy_stock_move,care_center_base.group_hospital_pharmacist,1,1,1,1
 access_hospital_pharmacy_stock_move_manager,stock.move.manager,model_hospital_pharmacy_stock_move,care_center_base.group_hospital_manager,1,1,1,1
-
-# Délivrances
 access_hospital_pharmacy_dispensing_all,dispensing.all,model_hospital_pharmacy_dispensing,base.group_user,1,0,0,0
 access_hospital_pharmacy_dispensing_system,dispensing.system,model_hospital_pharmacy_dispensing,base.group_system,1,1,1,1
 access_hospital_pharmacy_dispensing_secretary,dispensing.secretary,model_hospital_pharmacy_dispensing,care_center_base.group_hospital_secretary,1,0,0,0
@@ -43,8 +34,6 @@ access_hospital_pharmacy_dispensing_nurse,dispensing.nurse,model_hospital_pharma
 access_hospital_pharmacy_dispensing_doctor,dispensing.doctor,model_hospital_pharmacy_dispensing,care_center_base.group_hospital_doctor,1,1,1,1
 access_hospital_pharmacy_dispensing_pharmacist,dispensing.pharmacist,model_hospital_pharmacy_dispensing,care_center_base.group_hospital_pharmacist,1,1,1,1
 access_hospital_pharmacy_dispensing_manager,dispensing.manager,model_hospital_pharmacy_dispensing,care_center_base.group_hospital_manager,1,1,1,1
-
-# Lignes de délivrance
 access_hospital_pharmacy_dispensing_line_all,dispensing.line.all,model_hospital_pharmacy_dispensing_line,base.group_user,1,0,0,0
 access_hospital_pharmacy_dispensing_line_system,dispensing.line.system,model_hospital_pharmacy_dispensing_line,base.group_system,1,1,1,1
 access_hospital_pharmacy_dispensing_line_secretary,dispensing.line.secretary,model_hospital_pharmacy_dispensing_line,care_center_base.group_hospital_secretary,1,0,0,0

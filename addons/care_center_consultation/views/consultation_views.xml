@@ -41,21 +41,21 @@
                             type="object"
                             string="Démarrer"
                             class="btn-primary"
-                            states="draft"/>
+                            invisible="state != 'draft'"/>
                     <button name="action_done"
                             type="object"
                             string="Terminer"
                             class="btn-success"
-                            states="in_progress"/>
+                            invisible="state != 'in_progress'"/>
                     <button name="action_cancel"
                             type="object"
                             string="Annuler"
-                            states="draft,in_progress"
+                            invisible="state not in ('draft', 'in_progress')"
                             confirm="Êtes-vous sûr de vouloir annuler cette consultation ?"/>
                     <button name="action_draft"
                             type="object"
                             string="Réouvrir"
-                            states="cancelled"/>
+                            invisible="state != 'cancelled'"/>
                     <field name="state" string="Statut" widget="statusbar"
                            statusbar_visible="draft,in_progress,done"
                            clickable="False"/>
@@ -78,7 +78,7 @@
                                 type="object"
                                 class="oe_stat_button"
                                 icon="fa-heartbeat"
-                                string="DME lié"/>
+                                string="Dossier médical lié"/>
                     </div>
 
                     <!-- En-tête -->
@@ -87,8 +87,7 @@
                             <field name="patient_id"
                                    placeholder="Sélectionnez un patient..."
                                    required="1"
-                                   class="oe_inline"
-                                   context="{'default_company_id': company_id}"/>
+                                   class="oe_inline"/>
                         </h1>
                         <group>
                             <div class="oe_inline">

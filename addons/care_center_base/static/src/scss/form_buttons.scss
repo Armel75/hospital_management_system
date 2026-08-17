@@ -1,0 +1,14 @@
+/* Afficher le texte des boutons Enregistrer / Ignorer dans les formulaires */
+.o_form_button_save::after {
+    content: "Enregistrer";
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.o_form_button_cancel::after {
+    content: "Ignorer";
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 12px;
+    margin-left: 4px;
+}

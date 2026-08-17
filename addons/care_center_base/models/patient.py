@@ -86,7 +86,7 @@ class HospitalPatient(models.Model):
     # =========================================================================
     nss = fields.Char(
         string='N° Sécurité Sociale',
-        required=True,
+        required=False,
         copy=False,
         tracking=True,
     )
@@ -351,6 +351,8 @@ class HospitalPatient(models.Model):
     @api.constrains('nss')
     def _check_nss(self):
         for record in self:
+            if not record.nss:
+                continue
             if not record._validate_nss():
                 raise ValidationError(
                     _("Le N° de Sécurité Sociale '%s' n'est pas valide. "

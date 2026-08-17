@@ -25,7 +25,7 @@
                        decoration-success="state == 'done'"
                        decoration-info="state == 'confirmed'"
                        decoration-warning="state == 'in_progress'"
-                       decoration-info="state == 'draft'"
+                       decoration-primary="state == 'draft'"
                        decoration-danger="state == 'cancelled'"
                        decoration-muted="state == 'noshow'"/>
                 <field name="company_id" optional="hide"/>
@@ -46,30 +46,30 @@
                             type="object"
                             string="Confirmer"
                             class="btn-primary"
-                            states="draft"/>
+                            invisible="state != 'draft'"/>
                     <button name="action_start"
                             type="object"
                             string="Démarrer la consultation"
                             class="btn-success"
-                            states="confirmed"/>
+                            invisible="state != 'confirmed'"/>
                     <button name="action_done"
                             type="object"
                             string="Terminer"
-                            states="in_progress"/>
+                            invisible="state != 'in_progress'"/>
                     <button name="action_noshow"
                             type="object"
                             string="Non honoré"
-                            states="confirmed,in_progress"
+                            invisible="state not in ('confirmed', 'in_progress')"
                             confirm="Confirmer que le patient ne s'est pas présenté ?"/>
                     <button name="action_cancel"
                             type="object"
                             string="Annuler"
-                            states="draft,confirmed,in_progress"
+                            invisible="state not in ('draft', 'confirmed', 'in_progress')"
                             confirm="Êtes-vous sûr de vouloir annuler ce rendez-vous ?"/>
                     <button name="action_draft"
                             type="object"
                             string="Réouvrir"
-                            states="cancelled,noshow"/>
+                            invisible="state not in ('cancelled', 'noshow')"/>
                     <field name="state" string="Statut" widget="statusbar"
                            statusbar_visible="draft,confirmed,in_progress,done"
                            clickable="False"/>
@@ -96,8 +96,7 @@
                             <field name="patient_id"
                                    placeholder="Sélectionnez un patient..."
                                    required="1"
-                                   class="oe_inline"
-                                   context="{'default_company_id': company_id}"/>
+                                   class="oe_inline"/>
                         </h1>
                         <group>
                             <div class="oe_inline">
@@ -111,7 +110,7 @@
 
                     <group>
                         <group>
-                            <field name="doctor_id" required="1"
+                            <field name="doctor_id"
                                    options="{'no_create': True}"/>
                             <field name="appointment_date" required="1"/>
                             <field name="duration_minutes"/>
@@ -121,7 +120,7 @@
                             <field name="appointment_type" required="1"/>
                             <field name="contact_phone" placeholder="06 XX XX XX XX"/>
                             <field name="consultation_id"
-                                   attrs="{'invisible': [('consultation_id', '=', False)]}"
+                                   invisible="consultation_id == False"
                                    widget="many2one_button"
                                    options="{'no_create': True}"/>
                         </group>
@@ -273,23 +272,11 @@
                       date_start="appointment_date"
                       date_stop="end_datetime"
                       color="doctor_id"
-                      mode="week"
-                      display_mode="month,week,day">
+                      mode="week">
                 <field name="patient_id"/>
                 <field name="doctor_id"/>
                 <field name="state"/>
                 <field name="appointment_type"/>
-                <tooltip>
-                    <div class="o_tooltip">
-                                        <strong><field name="patient_id"/></strong>
-                                        <br/>
-                                        <i class="fa fa-user-md"/> <field name="doctor_id"/>
-                                        <br/>
-                                        <i class="fa fa-tag"/> <field name="appointment_type"/>
-                                        <br/>
-                                        <i class="fa fa-info-circle"/> <field name="state"/>
-                                    </div>
-                </tooltip>
             </calendar>
         </field>
     </record>

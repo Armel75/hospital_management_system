@@ -25,7 +25,7 @@
                         type="object"
                         string="Générer facture"
                         class="btn-secondary"
-                        states="done"/>
+                        invisible="state != 'done'"/>
             </xpath>
             <xpath expr="//field[@name='consultation_id']" position="after">
                 <field name="invoice_status" string="Facturation" widget="badge"
@@ -59,7 +59,7 @@
                         type="object"
                         string="Générer facture"
                         class="btn-secondary"
-                        states="done"/>
+                        invisible="state != 'done'"/>
             </xpath>
             <xpath expr="//field[@name='consultation_id']" position="after">
                 <field name="invoice_status" string="Facturation" widget="badge"
@@ -80,7 +80,7 @@
         <field name="model">hospital.patient</field>
         <field name="inherit_id" ref="care_center_base.view_hospital_patient_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@string='Notes']" position="before">
+            <xpath expr="//page[last()]" position="before">
                 <page string="Facturation">
                     <group string="Assurance">
                         <group>

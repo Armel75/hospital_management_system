@@ -50,21 +50,21 @@
                             type="object"
                             string="Confirmer"
                             class="btn-primary"
-                            states="draft"/>
+                            invisible="state != 'draft'"/>
                     <button name="action_register_payment"
                             type="object"
                             string="Enregistrer un paiement"
                             class="btn-success"
-                            states="confirmed"/>
+                            invisible="state != 'confirmed'"/>
                     <button name="action_cancel"
                             type="object"
                             string="Annuler"
-                            states="draft,confirmed"
+                            invisible="state not in ('draft', 'confirmed')"
                             confirm="Êtes-vous sûr de vouloir annuler cette facture ?"/>
                     <button name="action_draft"
                             type="object"
                             string="Réouvrir"
-                            states="cancelled"/>
+                            invisible="state != 'cancelled'"/>
                     <field name="state" string="Statut" widget="statusbar"
                            statusbar_visible="draft,confirmed"
                            clickable="False"/>
@@ -84,8 +84,7 @@
                             <field name="patient_id"
                                    placeholder="Sélectionnez un patient..."
                                    required="1"
-                                   class="oe_inline"
-                                   context="{'default_company_id': company_id}"/>
+                                   class="oe_inline"/>
                         </h1>
                         <group>
                             <div class="oe_inline">
@@ -107,9 +106,9 @@
                         <group>
                             <field name="insurance_id" options="{'no_create': True}"/>
                             <field name="insurance_number"
-                                   attrs="{'invisible': [('insurance_id', '=', False)]}"/>
+                                   invisible="insurance_id == False"/>
                             <field name="coverage_rate" widget="statinfo"
-                                   attrs="{'invisible': [('insurance_id', '=', False)]}"/>
+                                   invisible="insurance_id == False"/>
                         </group>
                     </group>
 

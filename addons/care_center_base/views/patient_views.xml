@@ -91,7 +91,7 @@
                             </group>
                             <group string="Identifiants administratifs">
                                 <group>
-                                    <field name="nss" required="1"
+                                    <field name="nss"
                                            placeholder="1 99 99 99 999 999 99"/>
                                     <field name="nss_key"/>
                                     <field name="nss_valid" widget="statinfo"/>

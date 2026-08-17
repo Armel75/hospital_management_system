@@ -42,21 +42,21 @@
                             type="object"
                             string="Confirmer"
                             class="btn-primary"
-                            states="draft"/>
+                            invisible="state != 'draft'"/>
                     <button name="action_done"
                             type="object"
                             string="Marquer délivré"
                             class="btn-success"
-                            states="confirmed"/>
+                            invisible="state != 'confirmed'"/>
                     <button name="action_cancel"
                             type="object"
                             string="Annuler"
-                            states="draft,confirmed"
+                            invisible="state not in ('draft', 'confirmed')"
                             confirm="Êtes-vous sûr de vouloir annuler cette délivrance ?"/>
                     <button name="action_draft"
                             type="object"
                             string="Réouvrir"
-                            states="cancelled"/>
+                            invisible="state != 'cancelled'"/>
                     <field name="state" string="Statut" widget="statusbar"
                            statusbar_visible="draft,confirmed,done"
                            clickable="False"/>
@@ -76,8 +76,7 @@
                             <field name="patient_id"
                                    placeholder="Sélectionnez un patient..."
                                    required="1"
-                                   class="oe_inline"
-                                   context="{'default_company_id': company_id}"/>
+                                   class="oe_inline"/>
                         </h1>
                         <group>
                             <div class="oe_inline">
@@ -111,7 +110,7 @@
                                            options="{'no_create': True}"/>
                                     <field name="lot_id" required="1"
                                            options="{'no_create': True}"
-                                           domain="[('medicament_id', '=', parent.medicament_id)]"/>
+                                           domain="[('medicament_id', '=', medicament_id)]"/>
                                     <field name="lot_expiry" optional="show"/>
                                     <field name="lot_available" string="Dispo" optional="show"/>
                                     <field name="quantity" required="1"/>

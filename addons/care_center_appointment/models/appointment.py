@@ -40,7 +40,7 @@ class HospitalAppointment(models.Model):
     doctor_id = fields.Many2one(
         'res.users',
         string='Médecin',
-        required=True,
+        required=False,
         domain=lambda self: [('groups_id', 'in', self._get_doctor_group_ids())],
         tracking=True,
     )
@@ -309,6 +309,10 @@ class HospitalAppointment(models.Model):
         """Crée une consultation liée à ce rendez-vous avec pré-remplissage"""
         Consultation = self.env['hospital.consultation']
         for record in self:
+            # Sans médecin renseigné, on ne peut pas générer de consultation :
+            # le modèle hospital.consultation exige un médecin (champ requis).
+            if not record.doctor_id:
+                continue
             consultation = Consultation.create({
                 'patient_id': record.patient_id.id,
                 'doctor_id': record.doctor_id.id,

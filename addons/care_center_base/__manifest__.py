@@ -28,6 +28,11 @@
         'views/menu_views.xml',
     ],
     'demo': [],
+    'assets': {
+        'web.assets_backend': [
+            'care_center_base/static/src/scss/form_buttons.scss',
+        ],
+    },
     'installable': True,
     'application': True,
     'auto_install': False,

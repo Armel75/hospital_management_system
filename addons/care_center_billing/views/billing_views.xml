@@ -41,10 +41,10 @@
                         <group>
                             <field name="coverage_type"/>
                             <field name="coverage_rate"
-                                   attrs="{'invisible': [('coverage_type', '!=', 'percentage')]}"/>
+                                   invisible="coverage_type != 'percentage'"/>
                             <field name="fixed_amount"
                                    widget="monetary"
-                                   attrs="{'invisible': [('coverage_type', '!=', 'fixed')]}"/>
+                                   invisible="coverage_type != 'fixed'"/>
                         </group>
                         <group>
                             <field name="active" widget="boolean_toggle"/>

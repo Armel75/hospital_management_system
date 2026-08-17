@@ -1,18 +1,13 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-# Grille tarifaire
 access_hospital_billing_rate_all,rate.all,model_hospital_billing_rate,base.group_user,1,0,0,0
 access_hospital_billing_rate_system,rate.system,model_hospital_billing_rate,base.group_system,1,1,1,1
 access_hospital_billing_rate_manager,rate.manager,model_hospital_billing_rate,care_center_base.group_hospital_manager,1,1,1,1
 access_hospital_billing_rate_admin,rate.admin,model_hospital_billing_rate,care_center_base.group_hospital_admin,1,1,1,1
-
-# Assurances
 access_hospital_billing_insurance_all,insurance.all,model_hospital_billing_insurance,base.group_user,1,0,0,0
 access_hospital_billing_insurance_system,insurance.system,model_hospital_billing_insurance,base.group_system,1,1,1,1
 access_hospital_billing_insurance_doctor,insurance.doctor,model_hospital_billing_insurance,care_center_base.group_hospital_doctor,1,0,0,0
 access_hospital_billing_insurance_manager,insurance.manager,model_hospital_billing_insurance,care_center_base.group_hospital_manager,1,1,1,1
 access_hospital_billing_insurance_admin,insurance.admin,model_hospital_billing_insurance,care_center_base.group_hospital_admin,1,1,1,1
-
-# Factures
 access_hospital_billing_invoice_all,invoice.all,model_hospital_billing_invoice,base.group_user,1,0,0,0
 access_hospital_billing_invoice_system,invoice.system,model_hospital_billing_invoice,base.group_system,1,1,1,1
 access_hospital_billing_invoice_secretary,invoice.secretary,model_hospital_billing_invoice,care_center_base.group_hospital_secretary,1,0,0,0
@@ -21,14 +16,10 @@ access_hospital_billing_invoice_doctor,invoice.doctor,model_hospital_billing_inv
 access_hospital_billing_invoice_pharmacist,invoice.pharmacist,model_hospital_billing_invoice,care_center_base.group_hospital_pharmacist,1,0,0,0
 access_hospital_billing_invoice_manager,invoice.manager,model_hospital_billing_invoice,care_center_base.group_hospital_manager,1,1,1,1
 access_hospital_billing_invoice_admin,invoice.admin,model_hospital_billing_invoice,care_center_base.group_hospital_admin,1,1,1,1
-
-# Lignes de facture
 access_hospital_billing_invoice_line_all,invoice.line.all,model_hospital_billing_invoice_line,base.group_user,1,0,0,0
 access_hospital_billing_invoice_line_system,invoice.line.system,model_hospital_billing_invoice_line,base.group_system,1,1,1,1
 access_hospital_billing_invoice_line_manager,invoice.line.manager,model_hospital_billing_invoice_line,care_center_base.group_hospital_manager,1,1,1,1
 access_hospital_billing_invoice_line_admin,invoice.line.admin,model_hospital_billing_invoice_line,care_center_base.group_hospital_admin,1,1,1,1
-
-# Paiements
 access_hospital_billing_payment_all,payment.all,model_hospital_billing_payment,base.group_user,1,0,0,0
 access_hospital_billing_payment_system,payment.system,model_hospital_billing_payment,base.group_system,1,1,1,1
 access_hospital_billing_payment_secretary,payment.secretary,model_hospital_billing_payment,care_center_base.group_hospital_secretary,1,0,0,0
