@@ -12,7 +12,7 @@ Déploiement de l'application `hospital_management_system` sur un cluster **k3s*
 ```mermaid
 flowchart LR
     U["Utilisateur → http://&lt;nœud&gt;"] --> I["Ingress Traefik (k3s)"]
-    I --> O["Service odoo:8069"]
+    I --> O["Service odoo:8169"]
     O --> P["Pod odoo (Odoo 17)"]
     P --> F["PVC hospital-odoo-data<br/>(/var/lib/odoo)"]
     P --> C["ConfigMap hospital-config<br/>+ Secret hospital-secrets"]
@@ -76,8 +76,8 @@ kubectl logs -n hospital -f statefulset/db
 # → http://<IP-DU-NOeUD>  (db_manager / base Odoo via l'UI)
 
 # En dev (sans Ingress externe) :
-kubectl port-forward -n hospital svc/odoo 8069:8069
-# → http://localhost:8069
+kubectl port-forward -n hospital svc/odoo 8169:8169
+# → http://localhost:8169
 ```
 
 ## 5. Sauvegardes

@@ -3,11 +3,12 @@
 # - Environnement : ConfigMap hospital-config + Secret hospital-secrets
 # - /var/lib/odoo : PVC hospital-odoo-data-pvc (filestore + sessions)
 # - Génération d'odoo.conf au démarrage :
-#     1. copie de la config par défaut de l'image (/etc/odoo/odoo.conf)
-#     2. ajout de admin_passwd DEPUIS LE SECRET (jamais en ConfigMap)
+#     1. retire les valeurs DB/admin héritées de la config de l'image (sed)
+#     2. ajoute admin_passwd DEPUIS LE SECRET (jamais en ConfigMap)
 #     3. l'entrypoint officiel passe db_host/db_port/db_user/db_password en
 #        arguments CLI (via les variables d'env HOST/PORT/USER/POSTGRES_PASSWORD),
 #        ce qui évite d'écrire le mot de passe dans un fichier.
+# - Port HTTP : 8169 (8069 est utilisé par une autre application sur le serveur).
 # - Healthcheck : /web/health (endpoint HTTP standard d'Odoo 17).
 # =============================================================================
 apiVersion: apps/v1
@@ -49,14 +50,14 @@ spec:
                   /etc/odoo/odoo.conf > /tmp/odoo.conf
               printf 'admin_passwd = %s\n' "${ADMIN_PASSWORD}" >> /tmp/odoo.conf
               export ODOO_RC=/tmp/odoo.conf
-              exec /entrypoint.sh odoo -c /tmp/odoo.conf
+              exec /entrypoint.sh odoo -c /tmp/odoo.conf --http-port=8169
           envFrom:
             - configMapRef:
                 name: hospital-config
             - secretRef:
                 name: hospital-secrets
           ports:
-            - containerPort: 8069
+            - containerPort: 8169
               name: http
           volumeMounts:
             - name: odoo-data
@@ -64,13 +65,13 @@ spec:
           readinessProbe:
             httpGet:
               path: /web/health
-              port: 8069
+              port: 8169
             initialDelaySeconds: 30
             periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /web/health
-              port: 8069
+              port: 8169
             initialDelaySeconds: 60
             periodSeconds: 15
           resources:

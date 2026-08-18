@@ -142,8 +142,8 @@ curl -I http://localhost/web/health
 ### 3.4 Port-forward (si pas d'Ingress externe)
 
 ```bash
-kubectl port-forward -n hospital svc/odoo 8069:8069
-# Puis ouvrir http://localhost:8069 sur ta machine
+kubectl port-forward -n hospital svc/odoo 8169:8169
+# Puis ouvrir http://localhost:8169 sur ta machine
 ```
 
 ---

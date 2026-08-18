@@ -1,5 +1,5 @@
 # =============================================================================
-# Service Odoo — point d'entrée du trafic (l'Ingress route vers odoo:8069).
+# Service Odoo — point d'entrée du trafic (l'Ingress route vers odoo:8169).
 # =============================================================================
 apiVersion: v1
 kind: Service
@@ -15,5 +15,5 @@ spec:
     tier: odoo
   ports:
     - name: http
-      port: 8069
-      targetPort: 8069
+      port: 8169
+      targetPort: 8169

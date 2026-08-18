@@ -122,7 +122,7 @@ complet (inspiré du projet Audit).
 ```mermaid
 flowchart LR
     U["Utilisateur → http://&lt;nœud&gt;"] --> I["Ingress Traefik (k3s)"]
-    I --> O["Service odoo:8069"]
+    I --> O["Service odoo:8169"]
     O --> P["Pod odoo (Odoo 17)"]
     P --> F["PVC hospital-odoo-data<br/>(/var/lib/odoo)"]
     P --> D["Service db:5432"]

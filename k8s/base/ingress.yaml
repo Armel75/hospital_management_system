@@ -1,6 +1,6 @@
 # =============================================================================
 # Ingress — exposition de l'application
-# Le pod Odoo (port 8069) est l'entrée unique du trafic utilisateur.
+# Le pod Odoo (port 8169) est l'entrée unique du trafic utilisateur.
 #
 # NB : Traefik est le contrôleur Ingress par défaut de k3s (IngressClass
 # "traefik"). Si vous utilisez nginx-ingress, remplacer par :
@@ -22,4 +22,4 @@ spec:
               service:
                 name: odoo
                 port:
-                  number: 8069
+                  number: 8169
