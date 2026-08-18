@@ -1,0 +1,86 @@
+# =============================================================================
+# Odoo 17 (image personnalisée / Dockerfile racine)
+# - Environnement : ConfigMap hospital-config + Secret hospital-secrets
+# - /var/lib/odoo : PVC hospital-odoo-data-pvc (filestore + sessions)
+# - Génération d'odoo.conf au démarrage :
+#     1. copie de la config par défaut de l'image (/etc/odoo/odoo.conf)
+#     2. ajout de admin_passwd DEPUIS LE SECRET (jamais en ConfigMap)
+#     3. l'entrypoint officiel passe db_host/db_port/db_user/db_password en
+#        arguments CLI (via les variables d'env HOST/PORT/USER/POSTGRES_PASSWORD),
+#        ce qui évite d'écrire le mot de passe dans un fichier.
+# - Healthcheck : /web/health (endpoint HTTP standard d'Odoo 17).
+# =============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odoo
+  namespace: hospital
+  labels:
+    app: hospital
+    tier: odoo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hospital
+      tier: odoo
+  template:
+    metadata:
+      labels:
+        app: hospital
+        tier: odoo
+    spec:
+      containers:
+        - name: odoo
+          image: hospital-odoo:1.0.0
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-lc"]
+          args:
+            - |
+              set -e
+              # Retire les valeurs DB/admin héritées de la config de l'image
+              # (le Dockerfile copie config/odoo.conf : db_password=odoo, admin_passwd)
+              # pour que l'entrypoint injecte celles du Secret (HOST/USER/POSTGRES_PASSWORD).
+              sed -e '/^admin_passwd[[:space:]]*=/d' \
+                  -e '/^db_host[[:space:]]*=/d' \
+                  -e '/^db_port[[:space:]]*=/d' \
+                  -e '/^db_user[[:space:]]*=/d' \
+                  -e '/^db_password[[:space:]]*=/d' \
+                  /etc/odoo/odoo.conf > /tmp/odoo.conf
+              printf 'admin_passwd = %s\n' "${ADMIN_PASSWORD}" >> /tmp/odoo.conf
+              export ODOO_RC=/tmp/odoo.conf
+              exec /entrypoint.sh odoo -c /tmp/odoo.conf
+          envFrom:
+            - configMapRef:
+                name: hospital-config
+            - secretRef:
+                name: hospital-secrets
+          ports:
+            - containerPort: 8069
+              name: http
+          volumeMounts:
+            - name: odoo-data
+              mountPath: /var/lib/odoo
+          readinessProbe:
+            httpGet:
+              path: /web/health
+              port: 8069
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /web/health
+              port: 8069
+            initialDelaySeconds: 60
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+      volumes:
+        - name: odoo-data
+          persistentVolumeClaim:
+            claimName: hospital-odoo-data-pvc

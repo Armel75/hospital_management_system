@@ -1,0 +1,115 @@
+# =============================================================================
+# CD — Déploiement continu Centre Hospitalier (Odoo 17)
+# -----------------------------------------------------------------------------
+# Ce workflow est déclenché par le succès du workflow CI (workflow_run) :
+#   - CI réussi sur main (branche "main")   → déploie STAGING
+#   - CI réussi sur un tag "v*"             → déploie PRODUCTION
+#   - workflow_dispatch                     → choix manuel de l'environnement
+#
+# Il NE BUILD PLUS l'image : il réutilise l'image immuable taguée SHA poussée
+# par le workflow CI. Garantie : l'image déployée = l'image testée.
+#
+# Prérequis (secrets du repo) :
+#   - KUBECONFIG   : kubeconfig du cluster k3s (base64)
+#   - ghcr-pull    : secret docker-registry dans le cluster
+#   - Protection  : required reviewers sur l'environnement "production"
+# =============================================================================
+name: CD — Déploiement
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environnement cible
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  deploy:
+    name: 🚀 Déployer
+    runs-on: ubuntu-latest
+    # Se déclenche si : CI réussi sur main (staging) ou sur tag v* (prod), ou dispatch
+    if: >-
+      (github.event_name == 'workflow_run' &&
+        github.event.workflow_run.conclusion == 'success' &&
+        (github.event.workflow_run.head_branch == 'main' ||
+         startsWith(github.event.workflow_run.head_branch, 'v'))) ||
+      github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ── Déterminer environnement et SHA de l'image ──────────────────────
+      # NB : les variables définies via $GITHUB_ENV ne sont disponibles que dans
+      # les étapes SUIVANTES → on utilise aussi des variables shell pour le log.
+      - name: Déterminer environnement et SHA
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            ENV_INPUT="${{ github.event.inputs.environment }}"
+            DEPLOY_ENV="$ENV_INPUT"
+            if [ "$ENV_INPUT" == "production" ]; then
+              DEPLOY_NS="hospital"
+            else
+              DEPLOY_NS="hospital-staging"
+            fi
+            DEPLOY_SHA="${{ github.sha }}"
+          elif [ "${{ github.event.workflow_run.head_branch }}" == "main" ]; then
+            DEPLOY_ENV="staging"
+            DEPLOY_NS="hospital-staging"
+            DEPLOY_SHA="${{ github.event.workflow_run.head_sha }}"
+          else
+            DEPLOY_ENV="production"
+            DEPLOY_NS="hospital"
+            DEPLOY_SHA="${{ github.event.workflow_run.head_sha }}"
+          fi
+          echo "DEPLOY_ENV=$DEPLOY_ENV" >> $GITHUB_ENV
+          echo "DEPLOY_NS=$DEPLOY_NS" >> $GITHUB_ENV
+          echo "DEPLOY_SHA=$DEPLOY_SHA" >> $GITHUB_ENV
+          echo "📦 Image : ${{ env.IMAGE_PREFIX }}/hospital-odoo:${DEPLOY_SHA}"
+          echo "🎯 Env   : ${DEPLOY_ENV} (namespace: ${DEPLOY_NS})"
+
+      - name: Installer kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Installer kustomize
+        run: |
+          curl -sSL "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+          kustomize version
+
+      - name: Configurer kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
+          kubectl version --client
+
+      # Fixe l'image au SHA poussé par le CI (image testée = image déployée)
+      - name: Fixer l'image dans kustomize (SHA immuable)
+        run: |
+          cd k8s/overlays/${{ env.DEPLOY_ENV }}
+          kustomize edit set image hospital-odoo=${{ env.IMAGE_PREFIX }}/hospital-odoo:${{ env.DEPLOY_SHA }}
+          kubectl kustomize . > /tmp/manifest.yaml
+
+      - name: Appliquer les manifests
+        run: kubectl apply -f /tmp/manifest.yaml
+
+      - name: Attendre le rollout
+        run: |
+          kubectl rollout status deployment/odoo \
+            -n ${{ env.DEPLOY_NS }} --timeout=300s
+
+      - name: Vérifier la santé
+        run: |
+          kubectl get pods -n ${{ env.DEPLOY_NS }}
+          kubectl get svc,ingress,statefulset -n ${{ env.DEPLOY_NS }}

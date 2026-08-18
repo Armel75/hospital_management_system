@@ -1,0 +1,52 @@
+# =============================================================================
+# Sauvegarde automatique PostgreSQL (CronJob K8s)
+# - pg_dump quotidien (02h00) dans un PVC dédié (hospital-backup-pvc)
+# - Rétention : les 7 derniers backups sont conservés
+# - Filestore Odoo (/var/lib/odoo) : à sauvegarder via le volume PVC
+#   (snapshot ou copie) — voir k8s/README.md → section Sauvegardes.
+# =============================================================================
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hospital-db-backup
+  namespace: hospital
+  labels:
+    app: hospital
+    tier: backup
+spec:
+  schedule: "0 2 * * *"   # tous les jours à 02h00
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: postgres:16
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: hospital-config
+                - secretRef:
+                    name: hospital-secrets
+              command: ["/bin/sh", "-c"]
+              args:
+                - |
+                  set -e
+                  export PGPASSWORD="${POSTGRES_PASSWORD}"
+                  STAMP=$(date +%Y%m%d_%H%M%S)
+                  pg_dump -h db -U "${POSTGRES_USER}" -F c -d "${POSTGRES_DB}" \
+                    > "/backup/db_${STAMP}.dump"
+                  # Rétention : garder les 7 backups les plus récents
+                  ls -1t /backup/db_*.dump 2>/dev/null | tail -n +8 | xargs -r rm -f
+                  echo "✅ Backup créé : /backup/db_${STAMP}.dump"
+              volumeMounts:
+                - name: backup-data
+                  mountPath: /backup
+          volumes:
+            - name: backup-data
+              persistentVolumeClaim:
+                claimName: hospital-backup-pvc

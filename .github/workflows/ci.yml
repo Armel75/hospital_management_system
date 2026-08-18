@@ -1,26 +1,31 @@
 # =============================================================================
-# CI/CD Pipeline — Centre Hospitalier
-# =============================================================================
-# Déclenché sur :
-#   - push sur main
-#   - pull request vers main
+# CI — Pipeline Qualité + Build + Test + Push
+# -----------------------------------------------------------------------------
+# Déclenché sur : push main, pull_request main
 #
-# Étapes :
-#   1. Vérification de la syntaxe Python (flake8)
-#   2. Vérification du formatage XML
-#   3. Build de l'image Docker
-#   4. Tests Odoo
+# Flux garantissant que l'image DÉPLOYÉE est EXACTEMENT celle TESTÉE :
+#   1. Lint (Python + XML)
+#   2. Build & Push image GHCR (tag SHA immuable)
+#   3. Test Odoo avec l'image buildée
+#   4. Scan sécurité Trivy (fichiers + image Docker)
+#
+# Le CD (deploy.yml) est déclenché AUTOMATIQUEMENT après succès de ce workflow.
 # =============================================================================
-
 name: CI
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/${{ github.repository_owner }}
+
 jobs:
+  # ── Job 1 : Qualité ─────────────────────────────────────────────────────
   lint:
     name: 🔍 Lint
     runs-on: ubuntu-latest
@@ -49,37 +54,20 @@ jobs:
       - name: Vérifier la syntaxe XML
         run: |
           echo "Vérification des fichiers XML..."
-          # Vérifier que tous les XML sont bien formés
           for xml_file in $(find addons/ -name "*.xml"); do
             python -c "import xml.etree.ElementTree as ET; ET.parse('$xml_file')" 2>/dev/null || \
               echo "❌ Erreur XML dans : $xml_file"
           done
           echo "✅ Tous les XML sont valides."
 
-  build:
-    name: 🐳 Build Docker
+  # ── Job 2 : Build, Test, Push (flux unique) ─────────────────────────────
+  build-test-push:
+    name: 🐳 Build → 🧪 Test → 📤 Push GHCR
     needs: lint
     runs-on: ubuntu-latest
-    steps:
-      - name: Cloner le dépôt
-        uses: actions/checkout@v4
-
-      - name: Configurer Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build de l'image Odoo
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: false
-          tags: care-center-odoo:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  test:
-    name: 🧪 Tests Odoo
-    needs: build
-    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     services:
       postgres:
         image: postgres:16
@@ -99,14 +87,31 @@ jobs:
       - name: Cloner le dépôt
         uses: actions/checkout@v4
 
-      - name: Charger l'image buildée
+      - name: Configurer Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build & Push immédiat — Docker layer cache (gha) rend le build rapide.
+      # L'image testée ci-dessous est la MÊME que celle déployée par le CD.
+      - name: Build & push image Odoo (SHA immuable)
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: false
-          tags: care-center-odoo:ci
-          load: true
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/hospital-odoo:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}/hospital-odoo:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
+      # Test avec l'image QUI VIENT D'ÊTRE POUSÉE (même SHA que le déploiement)
       - name: Lancer les tests Odoo
         run: |
           docker run --rm \
@@ -115,7 +120,7 @@ jobs:
             -e HOST=localhost \
             -e USER=odoo \
             -e PASSWORD=odoo \
-            care-center-odoo:ci \
+            ${{ env.IMAGE_PREFIX }}/hospital-odoo:${{ github.sha }} \
             odoo \
             --test-enable \
             --stop-after-init \
@@ -125,3 +130,25 @@ jobs:
             --addons-path=/mnt/extra-addons,/usr/lib/python3/dist-packages/odoo/addons \
             -d test_hospital \
             -i care_center_base,care_center_consultation,care_center_appointment,care_center_pharmacy,care_center_billing
+
+      # Scan Trivy des fichiers (manifests, Dockerfile, XML…)
+      - name: Trivy — scan fichiers
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+          ignore-unfixed: true
+
+      # Scan Trivy de l'IMAGE Docker poussée
+      - name: Trivy — scan image
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: ${{ env.IMAGE_PREFIX }}/hospital-odoo:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+          ignore-unfixed: true

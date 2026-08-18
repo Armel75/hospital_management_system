@@ -1,0 +1,38 @@
+# =============================================================================
+# Overlay STAGING — Hôpital
+# Environnement de pré-validation. Images immuables taguées par la CI/CD
+# (le workflow deploy.yml remplace le tag par le SHA du commit).
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Base : manifests communs (k8s/base/)
+resources:
+  - ../../base
+
+# Namespace isolé pour le staging (toutes les ressources)
+namespace: hospital-staging
+
+# Registre + tags d'images (surchargés par la CI/CD avec le SHA)
+images:
+  - name: hospital-odoo
+    newName: ghcr.io/armel75/hospital-odoo
+    newTag: latest
+
+patches:
+  # Replicas réduits en staging
+  - target:
+      kind: Deployment
+      name: odoo
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  # Pull depuis le registre privé (secret à créer, voir README)
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+          - name: ghcr-pull

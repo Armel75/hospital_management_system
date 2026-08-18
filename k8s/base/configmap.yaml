@@ -1,0 +1,23 @@
+# =============================================================================
+# Variables d'environnement NON sensibles (ConfigMap)
+# Source unique de vérité : env. Le pod Odoo génère son odoo.conf au démarrage
+# à partir de ces variables (HOST/PORT/USER) + du Secret (mot de passe).
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hospital-config
+  namespace: hospital
+data:
+  # ── Base de données ──────────────────────────────────────────────────────
+  # HOST = nom du Service K8s "db" (identique au service docker-compose)
+  HOST: "db"
+  PORT: "5432"
+  USER: "odoo"
+  POSTGRES_USER: "odoo"
+  POSTGRES_DB: "postgres"
+
+  # ── Odoo ─────────────────────────────────────────────────────────────────
+  ODOO_LOG_LEVEL: "info"
+  # Filtre de base de données (^%d$ pour n'autoriser qu'une seule DB)
+  DBFILTER: ".*"

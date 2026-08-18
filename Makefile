@@ -22,7 +22,9 @@ GREEN := \033[1;32m
 YELLOW := \033[1;33m
 RESET := \033[0m
 
-.PHONY: help up down restart logs ps shell backup restore init
+.PHONY: help up down restart logs ps shell backup restore init ci \
+	k8s:apply k8s:delete k8s:status k8s:build k8s:load \
+	argocd:install argocd:password argocd:apps argocd:sync
 
 help: ## Affiche cette aide
 	@echo "$(BLUE)╔══════════════════════════════════════════╗"
@@ -134,6 +136,37 @@ ci: ## Simule la CI localement (lint + build)
 	@make lint-xml
 	docker compose build
 	@echo "$(GREEN)✅ CI locale passée.$(RESET)"
+
+# ── Kubernetes / k3s ──────────────────────────────────────────────────────
+
+k8s:apply: ## ☸️ Applique les manifests Kubernetes (kubectl apply -k k8s)
+	kubectl apply -k k8s
+
+k8s:delete: ## ☸️ Supprime le déploiement Kubernetes
+	kubectl delete -k k8s
+
+k8s:status: ## ☸️ Statut des pods / services / ingress
+	kubectl get pods,svc,ingress,statefulset -n hospital
+
+k8s:build: ## 🐳 Construit l'image Odoo pour K8s
+	docker build -t hospital-odoo:1.0.0 .
+
+k8s:load: ## ☸️ Importe l'image dans k3s (mono-nœud)
+	docker save hospital-odoo:1.0.0 | sudo k3s ctr images import -
+
+# ── GitOps (ArgoCD) ───────────────────────────────────────────────────────
+
+argocd:install: ## 🔁 Installe ArgoCD sur k3s (à lancer sur le nœud k3s)
+	bash argocd/install.sh
+
+argocd:password: ## 🔁 Mot de passe admin ArgoCD initial
+	kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo ""
+
+argocd:apps: ## 🔁 Déclare le projet + les applications GitOps
+	kubectl apply -f argocd/project.yaml -f argocd/app-of-apps.yaml
+
+argocd:sync: ## 🔁 Force la synchronisation des applications
+	argocd app sync hospital-apps --prune
 
 init: ## Initialisation du projet (copie .env, démarrage)
 	@if [ ! -f .env ]; then \

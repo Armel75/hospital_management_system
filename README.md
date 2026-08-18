@@ -113,6 +113,39 @@ Ou via les scripts :
 
 ---
 
+## ☸️ DevOps / Kubernetes (k3s)
+
+Le projet est **100 % DevOps** : l'application peut être déployée sur un cluster
+**k3s** via **kustomize**, avec **GitOps (ArgoCD)** et un **CI/CD GitHub Actions**
+complet (inspiré du projet Audit).
+
+```mermaid
+flowchart LR
+    U["Utilisateur → http://&lt;nœud&gt;"] --> I["Ingress Traefik (k3s)"]
+    I --> O["Service odoo:8069"]
+    O --> P["Pod odoo (Odoo 17)"]
+    P --> F["PVC hospital-odoo-data<br/>(/var/lib/odoo)"]
+    P --> D["Service db:5432"]
+    D --> DB["StatefulSet PostgreSQL 16"]
+    DB --> B["CronJob backup (pg_dump)"]
+    G["GitHub Actions CI/CD"] -->|images SHA → GHCR| P
+    A["ArgoCD GitOps"] -->|sync kustomize| P
+```
+
+**Démarrage rapide K8s** (sur un nœud k3s) :
+
+```bash
+make k8s:build        # docker build -t hospital-odoo:1.0.0 .
+make k8s:load         # importe l'image dans k3s
+# Éditer k8s/base/secrets.yaml (POSTGRES_PASSWORD, ADMIN_PASSWORD)
+make k8s:apply        # kubectl apply -k k8s/
+make k8s:status       # état des pods/services/ingress
+```
+
+**GitOps** : voir [`k8s/README.md`](k8s/README.md) et [`argocd/README.md`](argocd/README.md).
+
+---
+
 ## 🗂️ Structure du projet
 
 ```
@@ -133,7 +166,12 @@ hospital_management_system/
 ├── docker-compose.yml              ← Services Docker
 ├── Dockerfile                      ← Image personnalisée (CI/prod)
 ├── Makefile                        ← Raccourcis de commandes
-└── README.md                       ← Ce fichier
+├── k8s/                            ← ☸️ Manifests Kubernetes (kustomize)
+│   ├── base/                       ←    Namespace, config, secrets, déploiements
+│   ├── overlays/                   ←    Staging & production
+│   └── README.md                   ←    Documentation K8s
+├── argocd/                         ← 🔁 GitOps (ArgoCD)
+└── .github/workflows/              ← 🚀 CI (ci.yml) + CD (deploy.yml)
 ```
 
 ---
@@ -144,6 +182,7 @@ hospital_management_system/
 2. Utiliser `.env.example` comme modèle pour les nouveaux développeurs
 3. Changer les mots de passe par défaut en production
 4. Le fichier de configuration `odoo.conf` contient le mot de passe admin hashé
+   (en K8s, il est injecté via un **Secret** — voir `k8s/base/secrets.yaml`)
 
 ---
 

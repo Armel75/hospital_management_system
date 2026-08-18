@@ -1,0 +1,31 @@
+# =============================================================================
+# EXEMPLE — SealedSecret (gestion des secrets en GitOps)
+# -----------------------------------------------------------------------------
+# ⚠️  Ne JAMAIS committer de Secret en clair (k8s/base/secrets.yaml contient
+# des placeholders CHANGE_ME). En GitOps, on chiffre les secrets avec
+# SealedSecrets : on committe le SealedSecret (sûr), et le contrôleur
+# sealed-secrets le déchiffre dans le cluster.
+#
+# 1) Installer le contrôleur (une fois) :
+#    kubectl apply -f https://github.com/bitnami-labs/sealed-secrets/releases/download/v0.27.1/controller.yaml
+# 2) Créer un SealedSecret depuis un fichier de valeurs :
+#    kubeseal --format yaml < secrets-values.yaml > sealed-secret.yaml
+# 3) Committer le SealedSecret ; ArgoCD l'applique ; le contrôleur le décrypte.
+# =============================================================================
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: hospital-secrets
+  namespace: hospital
+  annotations:
+    sealedsecrets.bitnami.com/managed: "true"
+spec:
+  encryptedData:
+    # ⚠️ Valeurs générées par kubeseal — remplacées automatiquement
+    POSTGRES_PASSWORD: AgBy3i4FAKE_encrypted_placeholder
+    ADMIN_PASSWORD: AgBy3i4FAKE_encrypted_placeholder
+  template:
+    metadata:
+      name: hospital-secrets
+      namespace: hospital
+    type: Opaque

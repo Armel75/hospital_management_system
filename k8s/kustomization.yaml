@@ -1,0 +1,11 @@
+# =============================================================================
+# Kustomization racine — Hôpital (Kubernetes / k3s)
+# Délègue vers la base commune. Pour des environnements isolés, utiliser les
+# overlays : k8s/overlays/staging et k8s/overlays/production.
+# Déploiement par défaut : kubectl apply -k k8s/
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ./base

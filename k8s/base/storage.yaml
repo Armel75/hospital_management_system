@@ -1,0 +1,31 @@
+# =============================================================================
+# Volumes persistants — données Odoo (filestore + sessions) et backups
+# StorageClass "local-path" = provisionneur par défaut de k3s (mono-nœud).
+# Pour un cluster multi-nœuds, remplacer par un stockage partagé (NFS…).
+# NB : le volume PostgreSQL est déclaré via volumeClaimTemplates du StatefulSet.
+# =============================================================================
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hospital-odoo-data-pvc
+  namespace: hospital
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hospital-backup-pvc
+  namespace: hospital
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi

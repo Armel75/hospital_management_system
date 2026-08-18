@@ -1,0 +1,10 @@
+# =============================================================================
+# Namespace dédié à l'application Hôpital (Odoo 17)
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hospital
+  labels:
+    app.kubernetes.io/name: hospital
+    app.kubernetes.io/part-of: care-center

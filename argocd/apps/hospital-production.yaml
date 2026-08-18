@@ -1,0 +1,37 @@
+# =============================================================================
+# Application GitOps — PRODUCTION
+# Synchronise automatiquement l'overlay kustomize k8s/overlays/production.
+#
+# Options de sécurité possibles (à activer selon votre politique) :
+#   - targetRevision: une branche/tag dédiée (ex: release) au lieu de main
+#   - syncPolicy.automated: false  → synchro manuelle contrôlée (approbation)
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hospital-production
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: hospital
+  source:
+    repoURL: https://github.com/Armel75/hospital_management_system.git
+    targetRevision: main
+    path: k8s/overlays/production
+    kustomize: {}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: hospital
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

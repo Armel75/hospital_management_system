@@ -1,0 +1,27 @@
+# =============================================================================
+# Overlay PRODUCTION — Hôpital
+# Déclenché par tag `v*` (ou dispatch manuel). Images immuables taguées SHA.
+# Protection d'environnement (required reviewers) à activer dans GitHub.
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+namespace: hospital
+
+images:
+  - name: hospital-odoo
+    newName: ghcr.io/armel75/hospital-odoo
+    newTag: latest
+
+patches:
+  # Pull depuis le registre privé (secret à créer, voir README)
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/imagePullSecrets
+        value:
+          - name: ghcr-pull

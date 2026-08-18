@@ -1,0 +1,19 @@
+# =============================================================================
+# Base — Hôpital (manifests communs à tous les environnements)
+# Utilisée par les overlays staging/production et par `kubectl apply -k k8s`
+# (le kustomization racine délègue vers ./base).
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - storage.yaml
+  - db-statefulset.yaml
+  - db-service.yaml
+  - odoo-deployment.yaml
+  - odoo-service.yaml
+  - ingress.yaml
+  - backup-cronjob.yaml

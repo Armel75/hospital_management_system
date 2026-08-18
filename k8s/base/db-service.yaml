@@ -1,0 +1,20 @@
+# =============================================================================
+# Service PostgreSQL — le NOM "db" est OBLIGATOIRE (HOST=db dans la ConfigMap,
+# identique au service docker-compose).
+# =============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: hospital
+  labels:
+    app: hospital
+    tier: db
+spec:
+  selector:
+    app: hospital
+    tier: db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432

@@ -1,0 +1,27 @@
+# =============================================================================
+# AppProject — Hôpital (GitOps)
+# Restreint les déploiements ArgoCD aux namespaces du projet sur le cluster
+# interne (https://kubernetes.default.svc).
+# =============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: hospital
+  namespace: argocd
+spec:
+  description: Centre Hospitalier — applications GitOps (Odoo 17)
+  # Dépôt source autorisé (à adapter : votre repo Git)
+  sourceRepos:
+    - 'https://github.com/Armel75/hospital_management_system.git'
+
+  # Destinations autorisées (namespace staging + prod sur le cluster interne)
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: hospital-staging
+    - server: https://kubernetes.default.svc
+      namespace: hospital
+
+  # Permissions minimales : création des Namespaces uniquement
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace

@@ -1,0 +1,25 @@
+# =============================================================================
+# Ingress — exposition de l'application
+# Le pod Odoo (port 8069) est l'entrée unique du trafic utilisateur.
+#
+# NB : Traefik est le contrôleur Ingress par défaut de k3s (IngressClass
+# "traefik"). Si vous utilisez nginx-ingress, remplacer par :
+#   annotations: kubernetes.io/ingress.class: nginx
+# =============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hospital-ingress
+  namespace: hospital
+spec:
+  ingressClassName: traefik
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: odoo
+                port:
+                  number: 8069
