@@ -80,7 +80,7 @@ jobs:
           echo "🎯 Env   : ${DEPLOY_ENV} (namespace: ${DEPLOY_NS})"
 
       - name: Installer kubectl
-        uses: azure/setup-kubectl@v4
+        uses: azure/setup-kubectl@v5
 
       - name: Installer kustomize
         run: |
